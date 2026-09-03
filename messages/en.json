@@ -1,0 +1,84 @@
+{
+  "DocsOverview": {
+    "eyebrow": "Template docs",
+    "title": "Source code overview",
+    "description": "A quick map of this Next.js 16 template: stack, main folders, and conventions for extending it.",
+    "navOverview": "Overview",
+    "navHow": "How it works",
+    "stackTitle": "Stack",
+    "foldersTitle": "Folder structure",
+    "foldersIntro": "Each folder has one clear job. Keep logic in the right layer.",
+    "folders": {
+      "app": "App Router — layouts, pages, error, not-found under [locale]",
+      "components": "shadcn UI + providers + site sections",
+      "configs": "ENV, endpoints, routes (constants)",
+      "fetches": "HTTP helpers for CMS / Rank Math / CF7",
+      "services": "Domain API wrappers over fetches",
+      "i18n": "routing, request config, locale-aware Link/router",
+      "hooks": "Shared React hooks",
+      "lib": "Small utilities (cn, …)",
+      "utils": "Helpers (scroll, metadata, Rank Math parse)",
+      "styles": "globals.css + Tailwind 4 theme tokens",
+      "messages": "Translation catalogs vi.json / en.json",
+      "proxy": "next-intl middleware (Next 16 uses proxy.ts)"
+    },
+    "conventionsTitle": "Key conventions",
+    "c1Label": "Locale:",
+    "c1": "default vi, prefix as-needed — / is Vietnamese, /en is English.",
+    "c2Label": "Navigation:",
+    "c2": "always use Link/useRouter from @/i18n/navigation, not raw next/link.",
+    "c3Label": "Alias:",
+    "c3": "@/* maps to src/*.",
+    "c4Label": "Package manager:",
+    "c4": "pnpm."
+  },
+  "DocsHow": {
+    "eyebrow": "Template docs",
+    "title": "How the source works",
+    "description": "Request flow, i18n, data layer, and how to add a new page in this template.",
+    "navOverview": "Overview",
+    "navHow": "How it works",
+    "requestTitle": "Request flow",
+    "requestIntro": "Every URL passes through these layers before the page renders.",
+    "flow": {
+      "proxy": "Resolve locale, rewrite pathnames (/gioi-thieu ↔ /about).",
+      "rootLayout": "Fonts, globals.css, QueryProvider, NuqsAdapter.",
+      "localeLayout": "Validate locale, setRequestLocale, NextIntlClientProvider + messages.",
+      "page": "Render the matching page (or [...rest] → notFound)."
+    },
+    "i18nTitle": "i18n & routing",
+    "i18n1": "Config lives in src/i18n/routing.ts — locales vi/en, defaultLocale vi.",
+    "i18n2": "Page files use the internal path: app/[locale]/gioi-thieu/. English public URL is /en/about via pathnames.",
+    "i18n3": "messages/vi.json and en.json are loaded in src/i18n/request.ts.",
+    "i18n4": "404: [locale]/not-found.tsx + catch-all [...rest]. Runtime errors: error.tsx / global-error.tsx.",
+    "dataTitle": "Data layer",
+    "dataIntro": "Split config → fetch → service → UI.",
+    "data": {
+      "configs": "ENV (DOMAIN/CMS/API), ENDPOINTS, ROUTES.",
+      "fetches": "fetchData() hits ENV.CMS + ENV.API + endpoint; Rank Math / CF7 helpers are separate.",
+      "services": "e.g. tourService wraps an endpoint and returns data to the page.",
+      "consume": "Server Components await the service, or Clients use TanStack Query."
+    },
+    "dataExampleBefore": "Example:",
+    "dataExampleAfter": "→ fetchData → WordPress REST.",
+    "providersTitle": "Providers",
+    "providers1": "QueryProvider (root): client cache, staleTime 60s, DevTools.",
+    "providers2": "NuqsAdapter (root): type-safe URL search params.",
+    "providers3": "Drawer/Sheet providers: controlled wrappers — mount when needed, not globally.",
+    "addPageTitle": "Add a new page",
+    "add1": "Create src/app/[locale]/your-page/page.tsx with setRequestLocale + useTranslations.",
+    "add2": "Add a pathname in routing.ts (and ROUTES if needed).",
+    "add3": "Add copy to messages/vi.json and messages/en.json.",
+    "add4": "Link with @/i18n/navigation using the internal pathname key."
+  },
+  "NotFoundPage": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "backHome": "Back to home"
+  },
+  "ErrorPage": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again.",
+    "retry": "Try again"
+  }
+}
