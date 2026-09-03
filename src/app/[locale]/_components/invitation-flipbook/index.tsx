@@ -26,8 +26,10 @@ const FlipPage = forwardRef<HTMLDivElement, FlipPageProps>(({ children, classNam
   return (
     <div
       ref={ref}
+      data-density='soft'
       className={cn(
-        'h-full w-full overflow-hidden bg-[#FCE35D] shadow-[0_1.5rem_4rem_rgba(44,31,14,0.28)]',
+        'h-full w-full overflow-hidden bg-[#FCE35D]',
+        'select-none shadow-[0_1.5rem_4rem_rgba(44,31,14,0.28)]',
         className,
       )}
     >
