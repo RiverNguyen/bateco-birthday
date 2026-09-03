@@ -29,9 +29,7 @@ export default function GlobalError({ error, reset }: Props) {
           }}
         >
           <p style={{ margin: 0, fontSize: '0.875rem', color: '#737373' }}>Error</p>
-          <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
-            Something went wrong
-          </h1>
+          <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Something went wrong</h1>
           <p style={{ margin: 0, maxWidth: '28rem', color: '#737373' }}>
             An unexpected error occurred. Please try again.
           </p>

@@ -56,7 +56,7 @@ const Page3 = () => {
           className='w-[8rem] h-auto object-contain mt-4 mx-auto'
         />
       </div>
-      <div className='absolute-x-center top-[8.75rem] w-[80%] '>
+      <div className='absolute-x-center top-[8.75rem] w-[80%]'>
         <div className='relative'>
           <div className='absolute bottom-[1rem] left-[6.125rem] top-[1.5rem] w-[0.12rem] bg-[#C29E4A]' />
           <div className='flex flex-col gap-[0.55rem]'>

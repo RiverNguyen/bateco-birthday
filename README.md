@@ -8,15 +8,15 @@ Tài liệu cấu trúc và cách dùng **Next.js 16 Template**.
 
 ## 1. Stack
 
-| Nhóm | Công nghệ |
-|------|-----------|
-| Core | Next.js 16 (App Router), React 19, TypeScript |
-| Style | Tailwind CSS 4, shadcn/ui, IBM Plex Sans / Mono |
-| i18n | next-intl (`vi` mặc định, `en`) |
-| Data | TanStack Query, nuqs |
-| Scroll | Lenis, GSAP |
-| Forms | react-hook-form + zod |
-| Deploy | `output: 'standalone'` |
+| Nhóm   | Công nghệ                                       |
+| ------ | ----------------------------------------------- |
+| Core   | Next.js 16 (App Router), React 19, TypeScript   |
+| Style  | Tailwind CSS 4, shadcn/ui, IBM Plex Sans / Mono |
+| i18n   | next-intl (`vi` mặc định, `en`)                 |
+| Data   | TanStack Query, nuqs                            |
+| Scroll | Lenis, GSAP                                     |
+| Forms  | react-hook-form + zod                           |
+| Deploy | `output: 'standalone'`                          |
 
 Package manager: **pnpm**. Alias: `@/*` → `src/*`.
 
@@ -77,12 +77,12 @@ Request
 
 Cấu hình: `src/i18n/routing.ts`
 
-| | |
-|--|--|
-| Locales | `vi`, `en` |
-| Default | `vi` |
-| Prefix | `as-needed` → `/` = vi, `/en/...` = en |
-| Pathnames | `/gioi-thieu` (vi) ↔ `/about` (en) |
+|           |                                        |
+| --------- | -------------------------------------- |
+| Locales   | `vi`, `en`                             |
+| Default   | `vi`                                   |
+| Prefix    | `as-needed` → `/` = vi, `/en/...` = en |
+| Pathnames | `/gioi-thieu` (vi) ↔ `/about` (en)     |
 
 ### Link nội bộ
 
@@ -165,12 +165,12 @@ const ROUTES = {
 configs/  →  fetches/  →  services/  →  page / component
 ```
 
-| Tầng | Vai trò | Ví dụ |
-|------|---------|--------|
-| `configs/env.ts` | `DOMAIN`, `CMS`, `API` từ env | `ENV.CMS` |
-| `configs/endpoints.ts` | Path API | `ENDPOINTS.tour.list` |
-| `fetches/fetchData.ts` | `fetch(CMS + API + endpoint)` | GET/POST generic |
-| `services/*` | Bọc domain | `tourService.getTours()` |
+| Tầng                   | Vai trò                       | Ví dụ                    |
+| ---------------------- | ----------------------------- | ------------------------ |
+| `configs/env.ts`       | `DOMAIN`, `CMS`, `API` từ env | `ENV.CMS`                |
+| `configs/endpoints.ts` | Path API                      | `ENDPOINTS.tour.list`    |
+| `fetches/fetchData.ts` | `fetch(CMS + API + endpoint)` | GET/POST generic         |
+| `services/*`           | Bọc domain                    | `tourService.getTours()` |
 
 ### Gọi trên Server Component
 
@@ -210,11 +210,11 @@ const [q, setQ] = useQueryState('q')
 
 ## 7. Providers
 
-| Provider | File | Gắn ở |
-|----------|------|--------|
-| TanStack Query | `components/providers/query-provider.tsx` | root layout |
-| nuqs | `nuqs/adapters/next/app` | root layout |
-| Lenis | `components/providers/lenis-provider.tsx` | root layout |
+| Provider       | File                                        | Gắn ở         |
+| -------------- | ------------------------------------------- | ------------- |
+| TanStack Query | `components/providers/query-provider.tsx`   | root layout   |
+| nuqs           | `nuqs/adapters/next/app`                    | root layout   |
+| Lenis          | `components/providers/lenis-provider.tsx`   | root layout   |
 | Drawer / Sheet | `drawer-provider.tsx`, `sheet-provider.tsx` | mount khi cần |
 
 ### Lenis
@@ -241,12 +241,12 @@ Section theo site: đặt ở `src/components/site/`.
 
 ## 9. SEO / CMS helpers
 
-| File | Mục đích |
-|------|----------|
-| `fetches/getMetaDataRankMath.ts` | Lấy head Rank Math |
-| `utils/parseRankMathHead.ts` | Parse HTML head |
-| `utils/metadataValues.ts` | Map metadata |
-| `fetches/cf7Request.ts` | Submit Contact Form 7 |
+| File                             | Mục đích              |
+| -------------------------------- | --------------------- |
+| `fetches/getMetaDataRankMath.ts` | Lấy head Rank Math    |
+| `utils/parseRankMathHead.ts`     | Parse HTML head       |
+| `utils/metadataValues.ts`        | Map metadata          |
+| `fetches/cf7Request.ts`          | Submit Contact Form 7 |
 
 Env cần có: `NEXT_PUBLIC_DOMAIN`, `NEXT_PUBLIC_CMS`, `NEXT_PUBLIC_API` (xem README).
 
@@ -254,12 +254,12 @@ Env cần có: `NEXT_PUBLIC_DOMAIN`, `NEXT_PUBLIC_CMS`, `NEXT_PUBLIC_API` (xem R
 
 ## 10. Error & 404
 
-| File | Khi nào |
-|------|---------|
-| `[locale]/not-found.tsx` | `notFound()` trong locale |
-| `app/not-found.tsx` | 404 ngoài locale tree |
-| `[locale]/error.tsx` | Runtime error trong locale |
-| `app/global-error.tsx` | Lỗi root (thay cả html/body) |
+| File                     | Khi nào                      |
+| ------------------------ | ---------------------------- |
+| `[locale]/not-found.tsx` | `notFound()` trong locale    |
+| `app/not-found.tsx`      | 404 ngoài locale tree        |
+| `[locale]/error.tsx`     | Runtime error trong locale   |
+| `app/global-error.tsx`   | Lỗi root (thay cả html/body) |
 
 ---
 
@@ -276,7 +276,7 @@ Env cần có: `NEXT_PUBLIC_DOMAIN`, `NEXT_PUBLIC_CMS`, `NEXT_PUBLIC_API` (xem R
 
 ## 12. URL tham chiếu
 
-| Locale | Home | Giới thiệu |
-|--------|------|------------|
-| vi | `/` | `/gioi-thieu` |
-| en | `/en` | `/en/about` |
+| Locale | Home  | Giới thiệu    |
+| ------ | ----- | ------------- |
+| vi     | `/`   | `/gioi-thieu` |
+| en     | `/en` | `/en/about`   |
