@@ -4,9 +4,9 @@ import Image from 'next/image'
 import { forwardRef, useRef, useState } from 'react'
 import HTMLFlipBook from 'react-pageflip'
 
-import Page1 from '@/app/[locale]/_components/page-1'
-import Page2 from '@/app/[locale]/_components/page-2'
-import Page3 from '@/app/[locale]/_components/page-3'
+import Page1 from '@/app/_components/page-1'
+import Page2 from '@/app/_components/page-2'
+import Page3 from '@/app/_components/page-3'
 import { cn, convertRemToPx } from '@/lib/utils'
 
 type PageFlipHandle = {

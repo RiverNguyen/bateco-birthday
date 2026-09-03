@@ -1,4 +1,4 @@
-import InvitationFlipbook from '@/app/[locale]/_components/invitation-flipbook'
+import InvitationFlipbook from '@/app/_components/invitation-flipbook'
 
 const Home = () => {
   return <InvitationFlipbook />
