@@ -121,9 +121,96 @@ body {
   pointer-events: none;
 }
 
+.book-stage {
+  perspective: 140rem;
+}
+
+.book-shell {
+  position: relative;
+  width: min(100%, 48rem);
+  aspect-ratio: 48 / 47;
+  transform-style: preserve-3d;
+}
+
+.book-shell::before {
+  position: absolute;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  left: 50%;
+  z-index: 68;
+  width: 1.2rem;
+
+  box-shadow:
+    -1.35rem 0 2.4rem rgba(35, 22, 8, 0.2),
+    1.35rem 0 2.4rem rgba(35, 22, 8, 0.18);
+  content: '';
+  opacity: 0.74;
+  pointer-events: none;
+  transform: translateX(-50%) translateZ(2px);
+}
+
+.book-shell[data-page-state='flipping']::before,
+.book-shell[data-page-state='user_fold']::before,
+.book-shell[data-page-state='fold_corner']::before {
+  opacity: 0.96;
+}
+
+.invitation-book {
+  overflow: visible !important;
+  filter: drop-shadow(0 1.6rem 1.9rem rgba(15, 9, 2, 0.2))
+    drop-shadow(0 0.5rem 0.55rem rgba(194, 158, 74, 0.16));
+  transform-style: preserve-3d;
+}
+
+.invitation-book .stf__wrapper,
+.invitation-book .stf__block {
+  overflow: visible !important;
+}
+
+.invitation-book .stf__item {
+  backface-visibility: hidden;
+}
+
+.invitation-flip-page {
+  border: 1px solid rgba(160, 114, 46, 0.26);
+
+  transform-style: preserve-3d;
+}
+
+.invitation-flip-page::before,
+.invitation-flip-page::after {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  content: '';
+  pointer-events: none;
+}
+
+.book-shell[data-page-state='flipping'] .invitation-flip-page::after,
+.book-shell[data-page-state='user_fold'] .invitation-flip-page::after,
+.book-shell[data-page-state='fold_corner'] .invitation-flip-page::after {
+  opacity: 0.56;
+}
+
+.invitation-book .stf__outerShadow,
+.invitation-book .stf__innerShadow,
+.invitation-book .stf__hardShadow,
+.invitation-book .stf__hardInnerShadow {
+  filter: blur(0.08rem);
+}
+
 @media (max-width: 639px) {
   .invitation-stage::after {
     inset: 0.75rem;
+  }
+
+  .book-shell {
+    width: min(100%, 24rem);
+    aspect-ratio: 24 / 47;
+  }
+
+  .book-shell::before {
+    opacity: 0;
   }
 }
 

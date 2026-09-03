@@ -76,11 +76,11 @@ const Page3 = () => {
         </div>
       </div>
       <Image
-        src='/logo.png'
+        src='/logo-2.png'
         alt='decor'
         width={800}
         height={800}
-        className='absolute-x-center bottom-[1.5rem] w-[10.5rem] h-auto object-contain opacity-20'
+        className='absolute-x-center bottom-[3.5rem] w-[6.5rem] h-auto object-contain opacity-20'
       />
     </section>
   )
