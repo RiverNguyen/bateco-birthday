@@ -94,7 +94,7 @@ const Page3 = () => {
         initial='hidden'
         animate={animateState}
         variants={staggerContainer}
-        className='absolute-x-center top-[3.875rem] w-[82%] text-center'
+        className='absolute-x-center top-[3.875rem] w-[82%] text-center xsm:top-[3.35rem]'
       >
         <motion.p
           variants={fadeUp}
@@ -112,7 +112,7 @@ const Page3 = () => {
           />
         </motion.div>
       </motion.div>
-      <div className='absolute-x-center top-[8.75rem] w-[80%]'>
+      <div className='absolute-x-center top-[8.75rem] w-[80%] xsm:top-[8.05rem]'>
         <div className='relative'>
           <motion.div
             initial='hidden'
@@ -122,7 +122,7 @@ const Page3 = () => {
               show: { scaleY: 1, transition: { duration: 1.1, ease: 'easeOut', delay: 0.3 } },
             }}
             style={{ transformOrigin: 'top' }}
-            className='absolute bottom-[1rem] left-[6.125rem] top-[1.5rem] w-[0.12rem] bg-[#C29E4A]'
+            className='absolute bottom-[1rem] left-[6.125rem] top-[1.5rem] w-[0.12rem] bg-[#C29E4A] xsm:bottom-[0.7rem] xsm:left-[5.85rem]'
           />
           <motion.div
             initial='hidden'
@@ -131,19 +131,19 @@ const Page3 = () => {
               hidden: {},
               show: { transition: { staggerChildren: 0.1, delayChildren: 0.35 } },
             }}
-            className='flex flex-col gap-[0.55rem]'
+            className='flex flex-col gap-[0.55rem] xsm:gap-[0.32rem]'
           >
             {schedule.map((item) => (
               <motion.div
                 key={`${item.time}-${item.title}`}
                 variants={scheduleItem}
-                className='relative grid min-h-[2.5rem] grid-cols-[5.1rem_1.2rem_1fr] items-center gap-3'
+                className='relative grid min-h-[2.5rem] grid-cols-[5.1rem_1.2rem_1fr] items-center gap-3 xsm:min-h-[2.22rem] xsm:gap-2'
               >
-                <p className='font-lora pt-1 text-[1.05rem] font-bold leading-tight text-[#002352]'>
+                <p className='font-lora pt-1 text-[1.05rem] font-bold leading-tight text-[#002352] xsm:text-[0.98rem]'>
                   {item.time}
                 </p>
                 <span className='relative z-10 mt-[0.45rem] size-[0.68rem] rounded-full bg-[#C29E4A] shadow-[0_0_0_0.18rem_rgba(194,158,74,0.12)]' />
-                <p className='pt-1 font-lora text-[0.75rem]'>{item.title}</p>
+                <p className='pt-1 font-lora text-[0.75rem] xsm:text-[0.68rem]'>{item.title}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -159,7 +159,7 @@ const Page3 = () => {
           alt='decor'
           width={800}
           height={800}
-          className='absolute-x-center bottom-[3.5rem] w-[6.5rem] h-auto object-contain opacity-20'
+          className='absolute-x-center bottom-[3.5rem] w-[6.5rem] h-auto object-contain opacity-20 xsm:bottom-[2.2rem]'
         />
       </motion.div>
     </section>

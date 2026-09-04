@@ -70,9 +70,10 @@ html {
 
 @media (max-width: 639px) {
   html {
-    /* Thiệp được thiết kế ở bề rộng 24rem. 24 × 4vw = 96vw → luôn vừa khung
-       màn hình (chừa ~4vw lề), không bị tràn chữ ra ngoài mép thiệp. */
-    font-size: 4vw;
+    /* Thiệp mobile thiết kế theo khung 24 × 47rem. Scale rem theo cạnh chật hơn
+       để nội dung bên trong co cùng kích thước trang thật, kể cả khi chiều cao
+       viewport trên điện thoại/webview thấp hơn DevTools. */
+    font-size: min(4vw, calc((100svh - 64px) / 47));
   }
 }
 
@@ -80,6 +81,8 @@ body {
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   overscroll-behavior: none;
   touch-action: manipulation;
   -webkit-user-drag: none;
@@ -134,8 +137,14 @@ body {
      phone, or a browser chrome that eats a lot of vertical space) that height can
      exceed what's visible, spilling the card past the screen. The 3rd min() term
      converts the actual available height back into an equivalent width cap, so the
-     card always shrinks to fit both width AND height. */
-  width: min(100%, 48rem, calc((100dvh - 4rem) * 48 / 47));
+     card always shrinks to fit both width AND height.
+     `svh` (not `dvh`): trên điện thoại thật, thanh địa chỉ/thanh điều hướng của
+     trình duyệt ăn vào chiều cao hiển thị — `dvh` đổi động theo lúc ẩn/hiện thanh
+     đó, khiến thiệp co giãn kích thước liên tục khi cuộn. `svh` luôn tính theo
+     trường hợp thanh trình duyệt hiện đầy đủ (nhỏ nhất), nên kích thước thiệp ổn
+     định ngay từ đầu, khớp với những gì DevTools (không mô phỏng thanh trình
+     duyệt) lẫn máy thật đều thấy giống nhau. */
+  width: min(100%, 48rem, calc((100svh - 4rem) * 48 / 47));
   aspect-ratio: 48 / 47;
   transform-style: preserve-3d;
 }
@@ -200,37 +209,11 @@ body {
   opacity: 0.56;
 }
 
-.invitation-book .stf__innerShadow,
-.invitation-book .stf__hardInnerShadow {
-  /* Bóng "trong" tạo vệt sáng-tối ngay tại nếp gấp — đây là chi tiết bán cái cảm
-     giác "mép giấy có độ dày", nên chỉ làm mờ rất nhẹ để giữ nếp gấp sắc nét,
-     không hoà nhoè thành một dải xám phẳng lì. Ám nâu vàng cho hợp tông kem. */
-  filter: blur(0.08rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg) contrast(1.1);
-}
-
-.book-shell[data-flip-direction='forward'] .invitation-book .stf__innerShadow,
-.book-shell[data-flip-direction='forward'] .invitation-book .stf__hardInnerShadow {
-  /* react-pageflip chỉ vẽ 1 gradient đen→trong suốt cho phần bóng "trong" — không
-     có lớp nền đặc phía sau nên nhìn "trong", như kính mờ. Ép nền kem đặc làm lớp
-     lót phía dưới gradient — JS chỉ set `background` (gradient) qua inline style
-     nên không đụng tới `background-color` ở đây; !important để thắng inline (JS
-     ghi đè mỗi khung hình nhưng chỉ set background-image, không phải
-     background-color).
-     Chỉ bật khi lật TỚI (forward): khi lật LÙI, react-pageflip tính vùng
-     innerShadow rộng hơn hẳn (không chỉ riêng chỗ cuộn), ép nền đặc lúc đó sẽ che
-     mất cả trang phía sau — nên [data-flip-direction] (đo hướng kéo ở
-     flip-book.tsx) dùng để loại trừ trường hợp đó ra.
-     Lưu ý: KHÔNG áp cho stf__outerShadow (dù forward hay back) — phần tử đó phủ
-     nguyên trang để đổ bóng xuống trang bên dưới, ép nền đặc ở đó sẽ che mất luôn
-     trang phía sau thay vì chỉ đổ bóng lên nó. */
-  background-color: #f8f1e4 !important;
-}
-
 .invitation-book .stf__outerShadow,
-.invitation-book .stf__hardShadow {
-  /* Bóng "ngoài" là bóng đổ của góc trang đang lật xuống mặt giấy bên dưới — đổ
-     bóng thật ngoài đời vốn mềm/loang, nên làm mờ nhiều hơn hẳn bóng trong. */
-  filter: blur(0.5rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg);
+.invitation-book .stf__innerShadow,
+.invitation-book .stf__hardShadow,
+.invitation-book .stf__hardInnerShadow {
+  filter: blur(0.08rem);
 }
 
 /* Điện thoại (< 640px) luôn quá hẹp để react-pageflip hiện 2 trang cạnh nhau, nên
@@ -244,7 +227,7 @@ body {
   }
 
   .book-shell {
-    width: min(100%, 24rem, calc((100dvh - 4rem) * 24 / 47));
+    width: min(100%, 24rem, calc((100svh - 4rem) * 24 / 47));
     aspect-ratio: 24 / 47;
   }
 
@@ -261,6 +244,44 @@ body {
   .invitation-flip-page::before,
   .invitation-flip-page::after {
     display: none;
+  }
+
+  /* Các chỉnh sửa bóng lật trang dưới đây CHỈ áp dụng cho mobile (portrait, 1
+     trang) — ở desktop (2 trang, landscape) khi lật gần hết một trang, vùng
+     stf__innerShadow phủ gần trọn cả trang chứ không chỉ riêng nếp cuộn nhỏ, nên
+     ép nền đặc + tô đậm màu ở đó biến thành một khối vàng phẳng che kín nội dung.
+     Scope theo @media để desktop giữ nguyên `filter: blur(0.08rem)` gốc. */
+  .invitation-book .stf__innerShadow,
+  .invitation-book .stf__hardInnerShadow {
+    /* Bóng "trong" tạo vệt sáng-tối ngay tại nếp gấp — đây là chi tiết bán cái cảm
+       giác "mép giấy có độ dày", nên chỉ làm mờ rất nhẹ để giữ nếp gấp sắc nét,
+       không hoà nhoè thành một dải xám phẳng lì. Ám nâu vàng cho hợp tông kem. */
+    filter: blur(0.08rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg) contrast(1.1);
+  }
+
+  .book-shell[data-flip-direction='forward'] .invitation-book .stf__innerShadow,
+  .book-shell[data-flip-direction='forward'] .invitation-book .stf__hardInnerShadow {
+    /* react-pageflip chỉ vẽ 1 gradient đen→trong suốt cho phần bóng "trong" —
+       không có lớp nền đặc phía sau nên nhìn "trong", như kính mờ. Ép nền kem đặc
+       làm lớp lót phía dưới gradient — JS chỉ set `background` (gradient) qua
+       inline style nên không đụng tới `background-color` ở đây; !important để
+       thắng inline (JS ghi đè mỗi khung hình nhưng chỉ set background-image,
+       không phải background-color).
+       Chỉ bật khi lật TỚI (forward): khi lật LÙI, react-pageflip tính vùng
+       innerShadow rộng hơn hẳn (không chỉ riêng chỗ cuộn), ép nền đặc lúc đó sẽ
+       che mất cả trang phía sau — nên [data-flip-direction] (đo hướng kéo ở
+       flip-book.tsx) dùng để loại trừ trường hợp đó ra.
+       Lưu ý: KHÔNG áp cho stf__outerShadow (dù forward hay back) — phần tử đó
+       phủ nguyên trang để đổ bóng xuống trang bên dưới, ép nền đặc ở đó sẽ che
+       mất luôn trang phía sau thay vì chỉ đổ bóng lên nó. */
+    background-color: #f8f1e4 !important;
+  }
+
+  .invitation-book .stf__outerShadow,
+  .invitation-book .stf__hardShadow {
+    /* Bóng "ngoài" là bóng đổ của góc trang đang lật xuống mặt giấy bên dưới —
+       đổ bóng thật ngoài đời vốn mềm/loang, nên làm mờ nhiều hơn hẳn bóng trong. */
+    filter: blur(0.5rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg);
   }
 }
 

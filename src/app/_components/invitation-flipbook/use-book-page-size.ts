@@ -18,6 +18,21 @@ type BookPageSize = {
   maxHeight: number
 }
 
+// `window.innerHeight` tracks the browser chrome (address/nav bars) collapsing on
+// scroll, same as CSS `dvh` — it'd make the book resize live as chrome hides, and
+// mismatch the `.book-shell` CSS cap in globals.css which deliberately uses `svh`
+// (chrome fully expanded, worst case) instead. Measuring an actual `100svh`
+// element gives the same stable, chrome-expanded height here in JS.
+let svhProbe: HTMLDivElement | null = null
+function getSvhPx(): number {
+  if (!svhProbe) {
+    svhProbe = document.createElement('div')
+    svhProbe.style.cssText = 'position:fixed;top:0;left:0;height:100svh;width:0;visibility:hidden;pointer-events:none;'
+    document.body.appendChild(svhProbe)
+  }
+  return svhProbe.getBoundingClientRect().height
+}
+
 function computeBookPageSize(): BookPageSize {
   if (typeof window === 'undefined') {
     return { width: 0, height: 0, minWidth: 0, maxWidth: 0, minHeight: 0, maxHeight: 0 }
@@ -26,7 +41,7 @@ function computeBookPageSize(): BookPageSize {
   const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
   const maxHeightCapPx = 47 * rootFontSize
   const minHeightCapPx = 25 * rootFontSize
-  const availableHeightPx = window.innerHeight - RESERVED_VERTICAL_REM * rootFontSize
+  const availableHeightPx = getSvhPx() - RESERVED_VERTICAL_REM * rootFontSize
   // Nội dung trang được thiết kế ở đúng 24rem — nhưng bề rộng thực tế không được
   // vượt quá khung nhìn, nếu không react-pageflip đặt inline-width lớn hơn màn hình
   // và chữ trong trang bị tràn / cắt ở mép phải.

@@ -14,7 +14,7 @@ const InvitationFlipbook = ({ guest }: { guest?: Guest | null }) => {
 
   return (
     <GuestProvider value={guest ?? null}>
-      <section className='invitation-stage relative flex min-h-dvh overflow-hidden text-[#5b3d19] pt-[2rem]'>
+      <section className='invitation-stage relative flex min-h-svh overflow-hidden text-[#5b3d19] pt-[2rem]'>
         <Image
           src='/bg-new.png'
           alt='Background'
