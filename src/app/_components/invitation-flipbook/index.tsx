@@ -14,7 +14,7 @@ const InvitationFlipbook = ({ guest }: { guest?: Guest | null }) => {
 
   return (
     <GuestProvider value={guest ?? null}>
-      <section className='invitation-stage relative flex min-h-svh overflow-hidden text-[#5b3d19] pt-[2rem]'>
+      <section className='invitation-stage relative flex min-h-svh overflow-hidden pt-[2rem] text-[#5b3d19] xsm:h-svh xsm:min-h-0 xsm:pt-[0.75rem]'>
         <Image
           src='/bg-new.png'
           alt='Background'
@@ -66,7 +66,7 @@ const InvitationFlipbook = ({ guest }: { guest?: Guest | null }) => {
           height={1000}
           unoptimized
         />
-        <div className='relative mx-auto flex w-full max-w-[78rem] flex-col items-center justify-center gap-5 xsm:max-w-full'>
+        <div className='relative mx-auto flex w-full max-w-[78rem] flex-col items-center justify-center gap-5 xsm:h-full xsm:max-w-full xsm:gap-2'>
           <FlipBook />
         </div>
         {!isMobile && <Countdown />}

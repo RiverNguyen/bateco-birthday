@@ -70,10 +70,9 @@ html {
 
 @media (max-width: 639px) {
   html {
-    /* Thiệp mobile thiết kế theo khung 24 × 47rem. Scale rem theo cạnh chật hơn
-       để nội dung bên trong co cùng kích thước trang thật, kể cả khi chiều cao
-       viewport trên điện thoại/webview thấp hơn DevTools. */
-    font-size: min(4vw, calc((100svh - 64px) / 47));
+    /* Mobile có thêm cụm nút prev/next dưới thiệp, nên rem phải scale theo tổng
+       chiều cao của cả thiệp + controls, không chỉ riêng trang 24 × 47rem. */
+    font-size: min(4vw, calc((100svh - 24px) / 51));
   }
 }
 
@@ -227,7 +226,7 @@ body {
   }
 
   .book-shell {
-    width: min(100%, 24rem, calc((100svh - 4rem) * 24 / 47));
+    width: min(100%, 24rem, calc((100svh - 5.25rem) * 24 / 47));
     aspect-ratio: 24 / 47;
   }
 

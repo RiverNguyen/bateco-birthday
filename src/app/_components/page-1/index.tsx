@@ -36,7 +36,7 @@ const Page1 = () => {
         alt='border'
         fill
         sizes='(max-width: 639px) 92vw, 460px'
-        className='object-contain w-'
+        className='object-contain'
       />
       <motion.div
         initial='hidden'
@@ -50,6 +50,7 @@ const Page1 = () => {
           className='h-auto w-full object-contain drop-shadow-[0_0.6rem_1.4rem_rgba(72,44,12,0.16)]'
           width={400}
           height={400}
+          unoptimized
         />
       </motion.div>
 

@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react'
 // Per-page aspect ratio (width / height) the flipbook is designed around.
 const PAGE_ASPECT = 24 / 47
 
-// Vertical space reserved outside the book (section's pt-[2rem] + breathing room).
+// Vertical space reserved outside the book (section padding + controls).
 // Must mirror the reserved space used by the `.book-shell` rules in globals.css.
-const RESERVED_VERTICAL_REM = 4
+const RESERVED_DESKTOP_VERTICAL_REM = 4
+const RESERVED_MOBILE_VERTICAL_REM = 5.25
 
 type BookPageSize = {
   width: number
@@ -27,7 +28,15 @@ let svhProbe: HTMLDivElement | null = null
 function getSvhPx(): number {
   if (!svhProbe) {
     svhProbe = document.createElement('div')
-    svhProbe.style.cssText = 'position:fixed;top:0;left:0;height:100svh;width:0;visibility:hidden;pointer-events:none;'
+    svhProbe.style.cssText = [
+      'position:fixed',
+      'top:0',
+      'left:0',
+      'height:100svh',
+      'width:0',
+      'visibility:hidden',
+      'pointer-events:none',
+    ].join(';')
     document.body.appendChild(svhProbe)
   }
   return svhProbe.getBoundingClientRect().height
@@ -41,7 +50,9 @@ function computeBookPageSize(): BookPageSize {
   const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
   const maxHeightCapPx = 47 * rootFontSize
   const minHeightCapPx = 25 * rootFontSize
-  const availableHeightPx = getSvhPx() - RESERVED_VERTICAL_REM * rootFontSize
+  const reservedVerticalRem =
+    window.innerWidth < 640 ? RESERVED_MOBILE_VERTICAL_REM : RESERVED_DESKTOP_VERTICAL_REM
+  const availableHeightPx = getSvhPx() - reservedVerticalRem * rootFontSize
   // Nội dung trang được thiết kế ở đúng 24rem — nhưng bề rộng thực tế không được
   // vượt quá khung nhìn, nếu không react-pageflip đặt inline-width lớn hơn màn hình
   // và chữ trong trang bị tràn / cắt ở mép phải.
