@@ -64,6 +64,29 @@ const FlipBook = () => {
   const [pageState, setPageState] = useState('read')
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('landscape')
   const bookPageSize = useBookPageSize()
+
+  // react-pageflip không báo hướng lật (tới/lui) qua bất kỳ event nào — nhưng vùng
+  // "innerShadow" của nó bị thư viện tính rộng bất thường khi lật lùi (BACK), nên
+  // lớp nền kem mình ép vào (chống hiệu ứng "trong suốt") lại che luôn cả trang
+  // phía sau trong TH đó. Tự theo dõi hướng kéo bằng con trỏ để chỉ bật lớp nền đó
+  // khi lật tới (FORWARD), nơi vùng innerShadow đã đúng kích thước khớp nếp gấp.
+  const [flipDirection, setFlipDirection] = useState<'forward' | 'back' | null>(null)
+  const pointerStartXRef = useRef<number | null>(null)
+  // Không lật (đã về `read`) thì hướng lật dở dang trước đó không còn ý nghĩa —
+  // suy ra thẳng từ pageState thay vì đồng bộ qua effect để tránh render lồng nhau.
+  const effectiveFlipDirection = pageState === 'read' ? null : flipDirection
+  const handlePointerDown = (event: React.PointerEvent) => {
+    pointerStartXRef.current = event.clientX
+  }
+  const handlePointerMove = (event: React.PointerEvent) => {
+    if (pointerStartXRef.current === null) return
+    const dx = event.clientX - pointerStartXRef.current
+    if (Math.abs(dx) < 4) return
+    setFlipDirection(dx < 0 ? 'forward' : 'back')
+  }
+  const handlePointerEnd = () => {
+    pointerStartXRef.current = null
+  }
   // Mobile: thêm trang 4 (xác nhận tham dự) vào cuốn thiệp, cùng hiệu ứng lật.
   const isMobile = useIsMobile()
   const pages = isMobile ? mobilePages : basePages
@@ -95,6 +118,11 @@ const FlipBook = () => {
               <div
                 className='book-shell'
                 data-page-state={pageState}
+                data-flip-direction={effectiveFlipDirection ?? undefined}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerEnd}
+                onPointerCancel={handlePointerEnd}
               >
                 {mounted && bookPageSize.width > 0 && (
                   <HTMLFlipBook
@@ -109,12 +137,12 @@ const FlipBook = () => {
                     maxHeight={bookPageSize.maxHeight}
                     size='stretch'
                     startPage={0}
-                    drawShadow={!isMobile}
+                    drawShadow
                     flippingTime={isMobile ? 700 : 1650}
                     usePortrait
                     startZIndex={30}
                     autoSize
-                    maxShadowOpacity={isMobile ? 0 : 0.86}
+                    maxShadowOpacity={0.86}
                     showCover={!isMobile}
                     mobileScrollSupport={false}
                     clickEventForward

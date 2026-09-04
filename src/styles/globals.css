@@ -200,11 +200,37 @@ body {
   opacity: 0.56;
 }
 
-.invitation-book .stf__outerShadow,
 .invitation-book .stf__innerShadow,
-.invitation-book .stf__hardShadow,
 .invitation-book .stf__hardInnerShadow {
-  filter: blur(0.08rem);
+  /* Bóng "trong" tạo vệt sáng-tối ngay tại nếp gấp — đây là chi tiết bán cái cảm
+     giác "mép giấy có độ dày", nên chỉ làm mờ rất nhẹ để giữ nếp gấp sắc nét,
+     không hoà nhoè thành một dải xám phẳng lì. Ám nâu vàng cho hợp tông kem. */
+  filter: blur(0.08rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg) contrast(1.1);
+}
+
+.book-shell[data-flip-direction='forward'] .invitation-book .stf__innerShadow,
+.book-shell[data-flip-direction='forward'] .invitation-book .stf__hardInnerShadow {
+  /* react-pageflip chỉ vẽ 1 gradient đen→trong suốt cho phần bóng "trong" — không
+     có lớp nền đặc phía sau nên nhìn "trong", như kính mờ. Ép nền kem đặc làm lớp
+     lót phía dưới gradient — JS chỉ set `background` (gradient) qua inline style
+     nên không đụng tới `background-color` ở đây; !important để thắng inline (JS
+     ghi đè mỗi khung hình nhưng chỉ set background-image, không phải
+     background-color).
+     Chỉ bật khi lật TỚI (forward): khi lật LÙI, react-pageflip tính vùng
+     innerShadow rộng hơn hẳn (không chỉ riêng chỗ cuộn), ép nền đặc lúc đó sẽ che
+     mất cả trang phía sau — nên [data-flip-direction] (đo hướng kéo ở
+     flip-book.tsx) dùng để loại trừ trường hợp đó ra.
+     Lưu ý: KHÔNG áp cho stf__outerShadow (dù forward hay back) — phần tử đó phủ
+     nguyên trang để đổ bóng xuống trang bên dưới, ép nền đặc ở đó sẽ che mất luôn
+     trang phía sau thay vì chỉ đổ bóng lên nó. */
+  background-color: #f8f1e4 !important;
+}
+
+.invitation-book .stf__outerShadow,
+.invitation-book .stf__hardShadow {
+  /* Bóng "ngoài" là bóng đổ của góc trang đang lật xuống mặt giấy bên dưới — đổ
+     bóng thật ngoài đời vốn mềm/loang, nên làm mờ nhiều hơn hẳn bóng trong. */
+  filter: blur(0.5rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg);
 }
 
 /* Điện thoại (< 640px) luôn quá hẹp để react-pageflip hiện 2 trang cạnh nhau, nên
@@ -222,8 +248,8 @@ body {
     aspect-ratio: 24 / 47;
   }
 
-  /* Trên mobile bỏ hết lớp bóng đổ tuỳ biến — chỉ giữ hiệu ứng lật mặc định,
-     nhẹ nhàng, không giật. */
+  /* Trên mobile bỏ bóng gáy sách (chỉ có ý nghĩa ở chế độ 2 trang) — bóng đổ khi
+     lật trang (stf__outerShadow/innerShadow) vẫn giữ, xem drawShadow trong flip-book.tsx. */
   .book-shell::before {
     display: none;
   }
@@ -235,13 +261,6 @@ body {
   .invitation-flip-page::before,
   .invitation-flip-page::after {
     display: none;
-  }
-
-  .invitation-book .stf__outerShadow,
-  .invitation-book .stf__innerShadow,
-  .invitation-book .stf__hardShadow,
-  .invitation-book .stf__hardInnerShadow {
-    display: none !important;
   }
 }
 
