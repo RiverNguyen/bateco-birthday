@@ -1,6 +1,8 @@
-export default function robots() {
+import type { MetadataRoute } from 'next'
+
+/** Microsite thiệp mời riêng tư — không cho bot lập chỉ mục trang nào. */
+export default function robots(): MetadataRoute.Robots {
   return {
-    rules: { userAgent: '*', allow: '/' },
-    sitemap: `${process.env.NEXT_PUBLIC_DOMAIN}/sitemap.xml`,
+    rules: { userAgent: '*', disallow: '/' },
   }
 }
