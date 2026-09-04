@@ -1,0 +1,40 @@
+// Prisma + PostgreSQL (Neon). Chạy `npx prisma migrate dev` để tạo bảng.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Danh sách khách mời + link thiệp, nạp từ file Excel qua trang admin.
+model Guest {
+  guestId    String   @id
+  slug       String?  @unique
+  stt        Int
+  category   String?
+  name       String
+  honorific  String?
+  title      String?
+  unit       String?
+  department String?
+  partner    String?
+  link       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+/// Một lượt xác nhận tham dự của khách mời (khoá theo id sinh từ tên + chức danh).
+model Rsvp {
+  guestId     String   @id
+  name        String
+  honorific   String?
+  title       String?
+  /// Số người tham gia: 1 (một mình) hoặc 2 (đi cùng phu nhân/phu quân).
+  partySize   Int
+  withPartner Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

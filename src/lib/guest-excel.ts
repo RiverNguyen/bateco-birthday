@@ -15,8 +15,12 @@ export const normalizeHeader = (value: unknown): string =>
     .toLowerCase()
     .trim()
 
+/** "Phạm Trung Hưng cùng phu nhân" -> "Phạm Trung Hưng" (cột phu nhân giữ phần đi cùng). */
+const stripPartnerSuffix = (name: string): string =>
+  name.replace(/\s*[-,]?\s*cùng\s+(phu\s*nhân|phu\s*quân)\b.*$/iu, '').trim()
+
 const COLUMN_MATCHERS: { key: keyof Guest; test: (header: string) => boolean }[] = [
-  { key: 'name', test: (h) => h.includes('ho va ten') || h.includes('ho ten') },
+  { key: 'name', test: (h) => h.includes('ho va ten') || h.includes('ho ten') || h.includes('ten khach') },
   { key: 'honorific', test: (h) => h.includes('danh xung') },
   { key: 'title', test: (h) => h.includes('chuc danh') },
   { key: 'unit', test: (h) => h.includes('don vi') },
@@ -28,7 +32,7 @@ export const LINK_HEADER = 'Link thiệp'
 
 const isNameHeader = (cell: unknown) => {
   const h = normalizeHeader(cell)
-  return h.includes('ho va ten') || h.includes('ho ten')
+  return h.includes('ho va ten') || h.includes('ho ten') || h.includes('ten khach')
 }
 
 /** Index of the row that holds the column headers, or -1. */
@@ -46,13 +50,18 @@ export const detectColumns = (headerRow: unknown[]): ColumnIndex => {
   return columnIndex
 }
 
-export const readGuestRow = (row: unknown[], columnIndex: ColumnIndex): Guest | null => {
+export const readGuestRow = (
+  row: unknown[],
+  columnIndex: ColumnIndex,
+  category?: string,
+): Guest | null => {
   const cell = (key: keyof Guest) => {
     const index = columnIndex[key]
     return index >= 0 ? String(row?.[index] ?? '').trim() : ''
   }
-  const name = cell('name')
-  if (!name) return null
+  const rawName = cell('name')
+  if (!rawName) return null
+  const name = stripPartnerSuffix(rawName) || rawName
   return {
     name,
     honorific: cell('honorific') || undefined,
@@ -60,6 +69,7 @@ export const readGuestRow = (row: unknown[], columnIndex: ColumnIndex): Guest | 
     unit: cell('unit') || undefined,
     department: cell('department') || undefined,
     partner: cell('partner') || undefined,
+    category: category || undefined,
   }
 }
 
@@ -72,7 +82,7 @@ export type ParsedSheet = {
   guests: { rowIndex: number; guest: Guest }[]
 }
 
-export const parseSheetMatrix = (matrix: unknown[][]): ParsedSheet => {
+export const parseSheetMatrix = (matrix: unknown[][], category?: string): ParsedSheet => {
   const headerRowIndex = findHeaderRow(matrix)
   if (headerRowIndex === -1) {
     throw new Error('Không tìm thấy cột "Họ và tên" trong file.')
@@ -85,9 +95,12 @@ export const parseSheetMatrix = (matrix: unknown[][]): ParsedSheet => {
 
   const guests: { rowIndex: number; guest: Guest }[] = []
   for (let rowIndex = headerRowIndex + 1; rowIndex < matrix.length; rowIndex += 1) {
-    const guest = readGuestRow(matrix[rowIndex] ?? [], columnIndex)
+    const guest = readGuestRow(matrix[rowIndex] ?? [], columnIndex, category)
     if (guest) guests.push({ rowIndex, guest })
   }
 
   return { headerRowIndex, columnIndex, linkColumnIndex, guests }
 }
+
+/** Không tìm thấy dòng tiêu đề (sheet không phải danh sách khách). */
+export const sheetHasGuestList = (matrix: unknown[][]): boolean => findHeaderRow(matrix) !== -1

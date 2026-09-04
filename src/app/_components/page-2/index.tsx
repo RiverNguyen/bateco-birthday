@@ -18,8 +18,11 @@ const Page2 = () => {
   const guestName = guest
     ? [guest.honorific, guest.name].filter(Boolean).join(' ')
     : 'Ông Phạm Trung Hưng'
+  // Thiệp nội bộ: chỉ hiện chức danh, bỏ đơn vị / bộ phận.
   const guestSubtitle = guest
-    ? [guest.title, [guest.unit, guest.department].filter(Boolean).join(' - ')].filter(Boolean)
+    ? guest.category === 'Nội bộ'
+      ? [guest.title].filter(Boolean)
+      : [guest.title, [guest.unit, guest.department].filter(Boolean).join(' - ')].filter(Boolean)
     : ['Nguyên Chánh văn phòng', 'Tập đoàn Công nghiệp Than - Khoáng sản Việt Nam']
   const guestPartner = guest ? guest.partner : 'Phu nhân'
 

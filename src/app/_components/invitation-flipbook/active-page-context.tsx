@@ -14,12 +14,13 @@ export const ActivePageProvider = ActivePageContext.Provider
  * - Landscape (book wide enough for 2 pages side by side): 2 states — 0 = cover
  *   alone, 1 = the final spread showing pages 2 and 3 together (state 2 never fires).
  * - Portrait (book only wide enough for 1 page): 3 states — 0 = cover, 1 = page 2,
- *   2 = page 3.
+ *   2 = page 3. Trên mobile có thêm trang 4 (xác nhận) → state 3.
  */
 export const FLIP_STATE = {
   cover: 0,
   spread: 1,
   portraitClosing: 2,
+  mobileRsvp: 3,
 } as const
 
 export function useIsActivePage(state: number) {

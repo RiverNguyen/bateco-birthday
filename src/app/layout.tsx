@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
-import { Lora, Pinyon_Script, Style_Script, Noto_Serif } from 'next/font/google'
+import { Lora, Noto_Serif, Pinyon_Script, Style_Script } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { Toaster } from 'sonner'
 
 import { LenisProvider } from '@/components/providers/lenis-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
+
 import '@/styles/globals.css'
 
 const lora = Lora({
@@ -47,6 +49,7 @@ export default function RootLayout({
         <QueryProvider>
           <NuqsAdapter>
             <LenisProvider>{children}</LenisProvider>
+            <Toaster richColors />
           </NuqsAdapter>
         </QueryProvider>
       </body>

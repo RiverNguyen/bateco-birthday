@@ -1,17 +1,15 @@
 /**
  * Per-guest invitation data.
  *
- * Each guest gets a short, stable id derived from their name + title, and the
- * invite link is `/{slug họ tên}-{id}` (e.g. `/pham-anh-tuan-k3x9f2`). The admin
- * page reads the Excel file, builds a `{ id: Guest }` map, and exports it as
- * `guests.json` — drop that file into `src/data/guests.json`, redeploy, and the
- * links work. The invitation page looks the guest up by id.
- *
- * Trade-off vs. encoding everything in the URL: links are short and shareable,
- * but changing the guest list means re-exporting `guests.json` and redeploying.
+ * `guestId` = mã băm nội bộ (tên + chức danh + đơn vị + bộ phận + tab), dùng làm
+ * khoá chính và để nối với xác nhận tham dự.
+ * `slug` = đường dẫn thiệp dạng `BTCGroup_Thiepmoi14AE_TenNguoiNhan` (xem
+ * `uniqueInviteSlug`), trang `src/app/[invite]/page.tsx` tra khách theo slug này.
  */
 
 export type Guest = {
+  /** `guestId` trong DB — có khi thiệp được mở từ một khách đã lưu. */
+  id?: string
   /** "Ông" / "Bà" — danh xưng */
   honorific?: string
   /** "Phạm Anh Tuấn" — họ và tên */
@@ -24,9 +22,9 @@ export type Guest = {
   department?: string
   /** "Phu nhân" / "Phu quân" — người đi cùng, nếu có */
   partner?: string
+  /** Tên tab trong file Excel: "Nội bộ" / "Khách" … */
+  category?: string
 }
-
-export type GuestMap = Record<string, Guest>
 
 /** Accent-free, lowercase, dash-separated slug of a Vietnamese string. */
 export const slugify = (value: string): string =>
@@ -40,7 +38,7 @@ export const slugify = (value: string): string =>
 
 /** Deterministic short id (base36) from the guest's identifying fields. */
 export const guestId = (guest: Guest): string => {
-  const seed = [guest.name, guest.title, guest.unit, guest.department]
+  const seed = [guest.category, guest.name, guest.title, guest.unit, guest.department]
     .map((part) => (part ?? '').trim().toLowerCase())
     .join('|')
     .normalize('NFD')
@@ -54,28 +52,36 @@ export const guestId = (guest: Guest): string => {
   return (hash >>> 0).toString(36).padStart(7, '0').slice(0, 7)
 }
 
-/** The full path segment for a guest, e.g. `pham-anh-tuan-k3x9f2`. */
-export const guestSlug = (guest: Guest): string => {
-  const id = guestId(guest)
-  const nameSlug = slugify(guest.name)
-  return nameSlug ? `${nameSlug}-${id}` : id
-}
+/** Phần đầu cố định của mọi đường dẫn thiệp. */
+export const INVITE_PREFIX = 'BTCGroup_Thiepmoi14AE'
 
-/** Pulls the trailing id back out of a `/{slug}-{id}` path segment. */
-export const idFromSlug = (segment: string): string => {
-  const parts = segment.split('-')
-  return parts[parts.length - 1] ?? ''
-}
+/** "Phạm Anh Tuấn" -> "PhamAnhTuan" (bỏ dấu, viết liền CamelCase). */
+const camelName = (name: string): string =>
+  slugify(name)
+    .split('-')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('')
 
-/** Root-relative (or absolute, with `origin`) invite link for one guest. */
-export const buildInviteLink = (guest: Guest, origin = ''): string =>
-  `${origin}/${guestSlug(guest)}`
+/** Slug cơ bản chưa xét trùng: `BTCGroup_Thiepmoi14AE_PhamAnhTuan`. */
+export const baseInviteSlug = (name: string): string =>
+  `${INVITE_PREFIX}_${camelName(name) || 'Khach'}`
 
-/** Builds the `{ id: Guest }` map to export as `guests.json`. */
-export const buildGuestMap = (guests: Guest[]): GuestMap => {
-  const map: GuestMap = {}
-  for (const guest of guests) {
-    map[guestId(guest)] = guest
+/**
+ * Slug duy nhất cho một khách. `taken` là tập slug đã dùng — hàm tự thêm `_2`,
+ * `_3`… khi trùng và ghi slug vừa cấp vào `taken`.
+ */
+export const uniqueInviteSlug = (name: string, taken: Set<string>): string => {
+  const base = baseInviteSlug(name)
+  let slug = base
+  let n = 2
+  while (taken.has(slug)) {
+    slug = `${base}_${n}`
+    n += 1
   }
-  return map
+  taken.add(slug)
+  return slug
 }
+
+/** Đường dẫn thiệp đầy đủ từ slug. */
+export const inviteUrl = (slug: string, origin = ''): string => `${origin}/${slug}`

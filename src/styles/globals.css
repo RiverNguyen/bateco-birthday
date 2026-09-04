@@ -220,8 +220,26 @@ body {
     aspect-ratio: 24 / 47;
   }
 
+  /* Trên mobile bỏ hết lớp bóng đổ tuỳ biến — chỉ giữ hiệu ứng lật mặc định,
+     nhẹ nhàng, không giật. */
   .book-shell::before {
-    opacity: 0;
+    display: none;
+  }
+
+  .invitation-book {
+    filter: drop-shadow(0 0.6rem 1rem rgba(15, 9, 2, 0.18));
+  }
+
+  .invitation-flip-page::before,
+  .invitation-flip-page::after {
+    display: none;
+  }
+
+  .invitation-book .stf__outerShadow,
+  .invitation-book .stf__innerShadow,
+  .invitation-book .stf__hardShadow,
+  .invitation-book .stf__hardInnerShadow {
+    display: none !important;
   }
 }
 
