@@ -23,6 +23,7 @@ const config: Config = {
         lora: ['var(--font-lora)', 'ui-serif', 'Georgia', 'serif'],
         'pinyon-script': ['var(--font-pinyon-script)', 'cursive'],
         'style-script': ['var(--font-style-script-face)', 'cursive'],
+        'noto-serif': ['var(--font-noto-serif)', 'serif'],
       },
       colors: {},
       backgroundImage: {},

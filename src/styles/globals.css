@@ -24,6 +24,7 @@
   --font-serif: var(--font-lora), ui-serif, Georgia, serif;
   --font-script: var(--font-pinyon-script), cursive;
   --font-display-script: var(--font-style-script-face), cursive;
+  --font-noto-serif: var(--font-noto-serif), serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -127,7 +128,12 @@ body {
 
 .book-shell {
   position: relative;
-  width: min(100%, 48rem);
+  /* `aspect-ratio` alone only derives height from width — on a short viewport (small
+     phone, or a browser chrome that eats a lot of vertical space) that height can
+     exceed what's visible, spilling the card past the screen. The 3rd min() term
+     converts the actual available height back into an equivalent width cap, so the
+     card always shrinks to fit both width AND height. */
+  width: min(100%, 48rem, calc((100dvh - 4rem) * 48 / 47));
   aspect-ratio: 48 / 47;
   transform-style: preserve-3d;
 }
@@ -199,13 +205,18 @@ body {
   filter: blur(0.08rem);
 }
 
+/* Điện thoại (< 640px) luôn quá hẹp để react-pageflip hiện 2 trang cạnh nhau, nên
+   khung container ở đây khớp sẵn theo tỉ lệ 1 trang — không "ép" gì cả, thư viện
+   vẫn tự quyết định portrait/landscape theo mặc định, chỉ là trên điện thoại kết
+   quả luôn là portrait. Tablet trở lên dùng chung rule `.book-shell` phía trên,
+   để thư viện tự chọn 1 hay 2 trang tuỳ độ rộng thực tế, y như desktop. */
 @media (max-width: 639px) {
   .invitation-stage::after {
     inset: 0.75rem;
   }
 
   .book-shell {
-    width: min(100%, 24rem);
+    width: min(100%, 24rem, calc((100dvh - 4rem) * 24 / 47));
     aspect-ratio: 24 / 47;
   }
 
