@@ -116,7 +116,7 @@ const FlipBook = () => {
                     autoSize
                     maxShadowOpacity={isMobile ? 0 : 0.86}
                     showCover={!isMobile}
-                    mobileScrollSupport
+                    mobileScrollSupport={false}
                     clickEventForward
                     useMouseEvents
                     swipeDistance={8}

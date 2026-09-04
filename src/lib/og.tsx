@@ -2,31 +2,6 @@ import { EVENT_NAME, EVENT_VENUE, EVENT_WHEN, ORG_NAME } from '@/lib/site'
 
 export const OG_SIZE = { width: 1200, height: 630 }
 
-const FONT = (weight: 400 | 600 | 700) =>
-  `https://cdn.jsdelivr.net/npm/@fontsource/be-vietnam-pro@5.1.0/files/be-vietnam-pro-vietnamese-${weight}-normal.woff`
-
-/** Tải font tiếng Việt cho ImageResponse; lỗi mạng thì trả mảng rỗng (dùng font mặc định). */
-export const loadOgFonts = async () => {
-  try {
-    const weights = [400, 600, 700] as const
-    const data = await Promise.all(
-      weights.map(async (w) => {
-        const res = await fetch(FONT(w))
-        if (!res.ok) throw new Error(`font ${w}`)
-        return res.arrayBuffer()
-      }),
-    )
-    return weights.map((weight, i) => ({
-      name: 'BVP',
-      data: data[i],
-      weight,
-      style: 'normal' as const,
-    }))
-  } catch {
-    return []
-  }
-}
-
 type CardProps = { who: string; title?: string; partner?: string; big?: boolean }
 
 /** Khung thiệp mời cho ảnh chia sẻ (Open Graph). */
@@ -40,7 +15,6 @@ export const OgCard = ({ who, title, partner, big = true }: CardProps) => (
       alignItems: 'center',
       justifyContent: 'center',
       padding: 56,
-      fontFamily: 'BVP',
       color: '#f7f0df',
       background: 'linear-gradient(135deg, #04162d 0%, #0b2b52 55%, #04162d 100%)',
     }}

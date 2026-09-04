@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-import { OG_SIZE, OgCard, loadOgFonts } from '@/lib/og'
+import { OG_SIZE, OgCard } from '@/lib/og'
 import { prisma } from '@/lib/prisma'
 
 export const runtime = 'nodejs'
@@ -17,7 +17,6 @@ export default async function OgImage({ params }: Params) {
     .findUnique({ where: { slug: decodeURIComponent(invite) } })
     .catch(() => null)
 
-  const fonts = await loadOgFonts()
   const who = guest
     ? [guest.honorific, guest.name].filter(Boolean).join(' ')
     : 'Trân trọng kính mời'
@@ -31,6 +30,6 @@ export default async function OgImage({ params }: Params) {
         big={Boolean(guest)}
       />
     ),
-    { ...size, fonts: fonts.length ? fonts : undefined },
+    size,
   )
 }
