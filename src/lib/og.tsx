@@ -1,8 +1,47 @@
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+
 import { EVENT_NAME, EVENT_VENUE, EVENT_WHEN, ORG_NAME } from '@/lib/site'
 
 export const OG_SIZE = { width: 1200, height: 630 }
 
 type CardProps = { who: string; title?: string; partner?: string; big?: boolean }
+type OgFont = {
+  name: string
+  data: ArrayBuffer
+  weight: 400 | 700
+  style: 'normal'
+}
+
+const fontPath = (file: string) => join(process.cwd(), 'public', 'fonts', file)
+const readFont = async (file: string) => {
+  const buffer = await readFile(fontPath(file))
+  return buffer.buffer.slice(
+    buffer.byteOffset,
+    buffer.byteOffset + buffer.byteLength,
+  ) as ArrayBuffer
+}
+
+let fontsPromise: Promise<OgFont[]> | null = null
+
+export const getOgFonts = () => {
+  fontsPromise ??= Promise.all([
+    readFont('NotoSans-Regular.ttf').then((data) => ({
+      name: 'Noto Sans',
+      data,
+      weight: 400 as const,
+      style: 'normal' as const,
+    })),
+    readFont('NotoSans-Bold.ttf').then((data) => ({
+      name: 'Noto Sans',
+      data,
+      weight: 700 as const,
+      style: 'normal' as const,
+    })),
+  ])
+
+  return fontsPromise
+}
 
 /** Khung thiệp mời cho ảnh chia sẻ (Open Graph). */
 export const OgCard = ({ who, title, partner, big = true }: CardProps) => (
@@ -15,6 +54,7 @@ export const OgCard = ({ who, title, partner, big = true }: CardProps) => (
       alignItems: 'center',
       justifyContent: 'center',
       padding: 56,
+      fontFamily: 'Noto Sans',
       color: '#f7f0df',
       background: 'linear-gradient(135deg, #04162d 0%, #0b2b52 55%, #04162d 100%)',
     }}
@@ -30,7 +70,7 @@ export const OgCard = ({ who, title, partner, big = true }: CardProps) => (
         borderRadius: 14,
       }}
     />
-    <div style={{ fontSize: 26, letterSpacing: 10, color: '#d2b26e', fontWeight: 600 }}>
+    <div style={{ fontSize: 28, color: '#d2b26e', fontWeight: 700 }}>
       THIỆP MỜI
     </div>
     <div
@@ -83,7 +123,7 @@ export const OgCard = ({ who, title, partner, big = true }: CardProps) => (
       style={{
         marginTop: 26,
         fontSize: 20,
-        letterSpacing: 4,
+        letterSpacing: 1.5,
         color: 'rgba(247,240,223,0.6)',
       }}
     >

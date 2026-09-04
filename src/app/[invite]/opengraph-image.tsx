@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-import { OG_SIZE, OgCard } from '@/lib/og'
+import { OG_SIZE, OgCard, getOgFonts } from '@/lib/og'
 import { prisma } from '@/lib/prisma'
 
 export const runtime = 'nodejs'
@@ -30,6 +30,6 @@ export default async function OgImage({ params }: Params) {
         big={Boolean(guest)}
       />
     ),
-    size,
+    { ...size, fonts: await getOgFonts() },
   )
 }
