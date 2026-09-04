@@ -48,8 +48,8 @@ const Page1 = () => {
           src='/logo.svg'
           alt='logo'
           className='h-auto w-full object-contain drop-shadow-[0_0.6rem_1.4rem_rgba(72,44,12,0.16)]'
-          width={400}
-          height={400}
+          width={1000}
+          height={1000}
           unoptimized
         />
       </motion.div>
