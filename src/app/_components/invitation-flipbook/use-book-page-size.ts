@@ -24,10 +24,13 @@ function computeBookPageSize(): BookPageSize {
   }
 
   const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
-  const maxWidthCapPx = 24 * rootFontSize
   const maxHeightCapPx = 47 * rootFontSize
   const minHeightCapPx = 25 * rootFontSize
   const availableHeightPx = window.innerHeight - RESERVED_VERTICAL_REM * rootFontSize
+  // Nội dung trang được thiết kế ở đúng 24rem — nhưng bề rộng thực tế không được
+  // vượt quá khung nhìn, nếu không react-pageflip đặt inline-width lớn hơn màn hình
+  // và chữ trong trang bị tràn / cắt ở mép phải.
+  const maxWidthCapPx = Math.min(24 * rootFontSize, window.innerWidth)
 
   // react-pageflip otherwise renders each page at a fixed 24×47rem regardless of
   // viewport height — on a short screen (small phone, or a browser chrome that eats

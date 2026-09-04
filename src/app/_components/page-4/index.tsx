@@ -115,24 +115,14 @@ const Page4 = () => {
         variants={staggerContainer}
         className='absolute-x-center top-[1.5rem] flex w-[82%] flex-col items-center text-center'
       >
-        <div className='flex items-center gap-2'>
-          <Image
-            src='/14-2.webp'
-            alt='14-2'
-            className='w-[5rem] h-auto object-contain'
-            width={1000}
-            height={1000}
-            unoptimized
-          />
-          <Image
-            src='/text-decor-gold-sweep.webp'
-            alt='text'
-            className=' w-[10rem] h-auto object-contain translate-y-[0.5rem]'
-            width={1000}
-            height={1000}
-            unoptimized
-          />
-        </div>
+        <Image
+          src='/logo-2.png'
+          alt='text'
+          className='opacity-30 w-[12.5rem] h-auto object-contain translate-y-[0.5rem]'
+          width={1000}
+          height={1000}
+          unoptimized
+        />
 
         <motion.p
           variants={fadeUp}

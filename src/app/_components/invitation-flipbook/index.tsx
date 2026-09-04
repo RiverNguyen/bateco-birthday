@@ -39,7 +39,7 @@ const InvitationFlipbook = ({ guest }: { guest?: Guest | null }) => {
           height={1000}
           unoptimized
         />
-        <div className='absolute-y-center left-0 flex'>
+        <div className='absolute-y-center left-0 flex xsm:hidden'>
           <Image
             src='/14-2.webp'
             alt='14-2'

@@ -70,7 +70,9 @@ html {
 
 @media (max-width: 639px) {
   html {
-    font-size: 4.26666667vw;
+    /* Thiệp được thiết kế ở bề rộng 24rem. 24 × 4vw = 96vw → luôn vừa khung
+       màn hình (chừa ~4vw lề), không bị tràn chữ ra ngoài mép thiệp. */
+    font-size: 4vw;
   }
 }
 
