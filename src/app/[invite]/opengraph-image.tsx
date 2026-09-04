@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-import { OG_SIZE, OgCard, getOgFonts } from '@/lib/og'
+import { OG_SIZE, OgCard, getOgAssets, getOgFonts } from '@/lib/og'
 import { prisma } from '@/lib/prisma'
 
 export const runtime = 'nodejs'
@@ -20,6 +20,7 @@ export default async function OgImage({ params }: Params) {
   const who = guest
     ? [guest.honorific, guest.name].filter(Boolean).join(' ')
     : 'Trân trọng kính mời'
+  const [assets, fonts] = await Promise.all([getOgAssets(), getOgFonts()])
 
   return new ImageResponse(
     (
@@ -28,8 +29,9 @@ export default async function OgImage({ params }: Params) {
         title={guest?.title ?? undefined}
         partner={guest?.partner ? `cùng ${guest.partner}` : undefined}
         big={Boolean(guest)}
+        assets={assets}
       />
     ),
-    { ...size, fonts: await getOgFonts() },
+    { ...size, fonts },
   )
 }
