@@ -1,6 +1,7 @@
 'use client'
 
-import { forwardRef, useEffect, useRef, useState } from 'react'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import HTMLFlipBook from 'react-pageflip'
 
 import {
@@ -53,6 +54,13 @@ const basePages = [
 
 const mobilePages = [...basePages, { id: 'rsvp', label: 'Xác nhận', content: <Page4 /> }]
 
+const isTypingTarget = (target: EventTarget | null) =>
+  Boolean(
+    (target as HTMLElement | null)?.closest(
+      'a, button, input, textarea, select, [contenteditable="true"]',
+    ),
+  )
+
 /**
  * A real page-turning book via react-pageflip, at every screen size. The library
  * itself decides — from the actual rendered width vs. page size — whether to show
@@ -90,6 +98,20 @@ const FlipBook = () => {
   // Mobile: thêm trang 4 (xác nhận tham dự) vào cuốn thiệp, cùng hiệu ứng lật.
   const isMobile = useIsMobile()
   const pages = isMobile ? mobilePages : basePages
+  const canFlipPrev = activePage > 0 && pageState === 'read'
+  const canFlipNext = activePage < pages.length - 1 && pageState === 'read'
+
+  const flipPrev = useCallback(() => {
+    if (!canFlipPrev) return
+    setFlipDirection('back')
+    bookRef.current?.pageFlip().flipPrev()
+  }, [canFlipPrev])
+
+  const flipNext = useCallback(() => {
+    if (!canFlipNext) return
+    setFlipDirection('forward')
+    bookRef.current?.pageFlip().flipNext()
+  }, [canFlipNext])
 
   // Chỉ dựng HTMLFlipBook SAU khi mount — lúc đó `isMobile` và kích thước đã đúng,
   // nên không phải remount (nguồn gây giật trang đầu trên mobile).
@@ -98,6 +120,35 @@ const FlipBook = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (isMobile) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey
+      ) {
+        return
+      }
+      if (isTypingTarget(event.target)) return
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        flipPrev()
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        flipNext()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [flipNext, flipPrev, isMobile])
 
   return (
     <>
@@ -138,7 +189,7 @@ const FlipBook = () => {
                     size='stretch'
                     startPage={0}
                     drawShadow
-                    flippingTime={isMobile ? 700 : 1650}
+                    flippingTime={isMobile ? 700 : 900}
                     usePortrait
                     startZIndex={30}
                     autoSize
@@ -176,12 +227,35 @@ const FlipBook = () => {
       </ActivePageProvider>
       <p
         className={cn(
-          ' text-[#bb934f] text-[1rem] font-semibold opacity-0 transition-opacity duration-300 ease-out',
+          'text-[#bb934f] text-[1rem] font-semibold opacity-0 transition-opacity duration-300 ease-out xsm:hidden',
           activePage === 0 && 'opacity-100',
         )}
       >
         Click hoặc vuốt màn hình để xem thiệp
       </p>
+      <div className='hidden items-center justify-center gap-3 xsm:flex'>
+        <button
+          type='button'
+          aria-label='Trang trước'
+          disabled={!canFlipPrev}
+          onClick={flipPrev}
+          className='flex size-[2.75rem] items-center justify-center rounded-full border border-[#bb934f]/55 bg-[#f8f1e4]/90 text-[#8a6a2f] shadow-[0_0.35rem_1rem_rgba(44,31,14,0.18)] transition-colors disabled:opacity-35'
+        >
+          <ChevronLeftIcon className='size-5' />
+        </button>
+        <span className='min-w-[4.25rem] rounded-full border border-[#bb934f]/35 bg-[#f8f1e4]/80 px-3 py-2 text-center font-lora text-[0.78rem] font-semibold text-[#8a6a2f] tabular-nums shadow-[0_0.35rem_1rem_rgba(44,31,14,0.12)]'>
+          {activePage + 1}/{pages.length}
+        </span>
+        <button
+          type='button'
+          aria-label='Trang sau'
+          disabled={!canFlipNext}
+          onClick={flipNext}
+          className='flex size-[2.75rem] items-center justify-center rounded-full border border-[#bb934f]/55 bg-[#f8f1e4]/90 text-[#8a6a2f] shadow-[0_0.35rem_1rem_rgba(44,31,14,0.18)] transition-colors disabled:opacity-35'
+        >
+          <ChevronRightIcon className='size-5' />
+        </button>
+      </div>
     </>
   )
 }

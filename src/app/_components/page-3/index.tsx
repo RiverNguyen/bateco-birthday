@@ -122,7 +122,7 @@ const Page3 = () => {
               show: { scaleY: 1, transition: { duration: 1.1, ease: 'easeOut', delay: 0.3 } },
             }}
             style={{ transformOrigin: 'top' }}
-            className='absolute bottom-[1rem] left-[6.125rem] top-[1.5rem] w-[0.12rem] bg-[#C29E4A] xsm:bottom-[0.7rem] xsm:left-[5.85rem]'
+            className='absolute bottom-[1rem] left-[6.125rem] top-[1.5rem] w-[0.12rem] bg-[#C29E4A] xsm:bottom-[0.7rem] xsm:left-[5.8675rem]'
           />
           <motion.div
             initial='hidden'
