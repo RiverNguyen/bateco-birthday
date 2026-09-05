@@ -231,6 +231,19 @@ const Page2 = () => {
           </motion.div>
         </motion.div>
       </motion.div>
+      <motion.div
+        initial='hidden'
+        animate={animateState}
+        variants={fadeIn}
+      >
+        <Image
+          src='/logo-2.png'
+          alt='decor'
+          width={800}
+          height={800}
+          className='page-three-logo absolute-x-center bottom-[3.5rem] w-[6.5rem] h-auto object-contain opacity-20 xsm:bottom-[2.2rem]'
+        />
+      </motion.div>
     </section>
   )
 }
