@@ -137,15 +137,13 @@ const Page3 = () => {
               <motion.div
                 key={`${item.time}-${item.title}`}
                 variants={scheduleItem}
-                className='page-three-item relative grid min-h-[2.5rem] grid-cols-[5.1rem_1.2rem_1fr] items-center gap-3 xsm:min-h-[2.22rem] xsm:gap-2'
+                className='page-three-item relative grid min-h-[2.5rem] grid-cols-[5.1rem_1.2rem_1fr] items-center gap-3'
               >
-                <p className='page-three-time font-lora pt-1 text-[1.05rem] font-bold leading-tight text-[#002352] xsm:text-[0.98rem]'>
+                <p className='page-three-time font-lora pt-1 text-[1.05rem] font-bold leading-tight text-[#002352]'>
                   {item.time}
                 </p>
                 <span className='relative z-10 mt-[0.45rem] size-[0.68rem] rounded-full bg-[#C29E4A] shadow-[0_0_0_0.18rem_rgba(194,158,74,0.12)]' />
-                <p className='page-three-title pt-1 font-lora text-[0.75rem] xsm:text-[0.68rem]'>
-                  {item.title}
-                </p>
+                <p className='page-three-title pt-1 font-lora text-[0.75rem]'>{item.title}</p>
               </motion.div>
             ))}
           </motion.div>

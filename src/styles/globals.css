@@ -68,11 +68,14 @@ html {
   font-size: 1vw;
 }
 
-/* @media (min-width: 1025px) and (max-height: 920px) {
+/* Trên desktop thấp, react-pageflip phải thu nhỏ trang theo chiều cao. Các
+   kích thước nội dung dùng rem nên cũng phải thu nhỏ theo cùng tỉ lệ; nếu vẫn
+   lấy 1vw thì chữ sẽ lớn hơn trang và bị tràn ra ngoài mép giấy. */
+@media (min-width: 1025px) and (max-height: 920px) {
   html {
-    font-size: min(1vw, calc((100svh - 16px) / 54));
+    font-size: min(1vw, calc((100svh - 16px) / 50));
   }
-} */
+}
 
 /* @media (min-width: 640px) and (max-width: 1024px) {
   html {
