@@ -68,11 +68,11 @@ html {
   font-size: 1vw;
 }
 
-@media (min-width: 1025px) and (max-height: 920px) {
+/* @media (min-width: 1025px) and (max-height: 920px) {
   html {
     font-size: min(1vw, calc((100svh - 16px) / 54));
   }
-}
+} */
 
 @media (min-width: 640px) and (max-width: 1024px) {
   html {
@@ -90,13 +90,11 @@ html {
   }
 }
 
-@media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
+/* @media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
   html {
-    /* Landscape thấp quá ít chiều cao để đặt controls dưới thiệp. Cho controls nổi
-       lên nền và để thiệp dùng gần trọn chiều cao màn. */
     font-size: min(2.45vw, calc((100svh - 12px) / 47));
   }
-}
+} */
 
 body {
   text-rendering: optimizeLegibility;
@@ -561,7 +559,7 @@ body {
   }
 }
 
-@media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
+/* @media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
   .book-shell {
     width: min(100%, 24rem, calc((100svh - 1rem) * 24 / 47));
   }
@@ -801,7 +799,7 @@ body {
   .page-four-actions p {
     font-size: 0.5rem;
   }
-}
+} */
 
 /* Ẩn thanh cuộn */
 .hidden_scroll {
