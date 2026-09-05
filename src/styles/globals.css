@@ -74,13 +74,11 @@ html {
   }
 } */
 
-@media (min-width: 640px) and (max-width: 1024px) {
+/* @media (min-width: 640px) and (max-width: 1024px) {
   html {
-    /* Tablet dùng layout 1 trang giống mobile nhưng vẫn tận dụng màn hình lớn hơn.
-       Cap theo chiều cao để iPad landscape và các màn tỉ lệ thấp không tràn viewport. */
     font-size: min(2.45vw, calc((100svh - 32px) / 51));
   }
-}
+} */
 
 @media (max-width: 639px) {
   html {
@@ -268,7 +266,7 @@ body {
   overflow-wrap: anywhere;
 }
 
-@media (min-width: 1025px) and (max-height: 920px) {
+/* @media (min-width: 1025px) and (max-height: 920px) {
   .page-two-content {
     top: 2.75rem;
   }
@@ -439,11 +437,11 @@ body {
     bottom: 2rem;
     width: 4.45rem;
   }
-}
+} */
 
 /* Tablet/mobile (< 1025px) dùng layout compact 1 trang; desktop mới là spread 2 trang.
    Như vậy tablet không bị biến thành desktop chỉ vì tỉ lệ viewport đủ rộng. */
-@media (min-width: 640px) and (max-width: 1024px) {
+/* @media (min-width: 640px) and (max-width: 1024px) {
   .invitation-stage::after {
     inset: 0.9rem;
   }
@@ -480,9 +478,9 @@ body {
   .invitation-book .stf__hardShadow {
     filter: blur(0.5rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg);
   }
-}
+} */
 
-@media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
+/* @media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
   .book-shell {
     width: min(100%, 24rem, calc((100svh - 1rem) * 24 / 47));
   }
@@ -493,7 +491,7 @@ body {
     bottom: max(0.75rem, env(safe-area-inset-bottom));
     z-index: 90;
   }
-}
+} */
 
 @media (max-width: 639px) {
   .invitation-stage::after {
