@@ -122,7 +122,7 @@ const Page3 = () => {
               show: { scaleY: 1, transition: { duration: 1.1, ease: 'easeOut', delay: 0.3 } },
             }}
             style={{ transformOrigin: 'top' }}
-            className='page-three-line absolute bottom-[1rem] left-[6.125rem] top-[1.5rem] w-[0.12rem] bg-[#C29E4A] xsm:bottom-[0.7rem] xsm:left-[5.8675rem]'
+            className='page-three-line absolute bottom-[1rem] left-[6.125rem] top-[1.5rem] w-[0.12rem] bg-[#C29E4A] xsm:bottom-[0.7rem] xsm:left-[6.135rem]'
           />
           <motion.div
             initial='hidden'
@@ -139,11 +139,13 @@ const Page3 = () => {
                 variants={scheduleItem}
                 className='page-three-item relative grid min-h-[2.5rem] grid-cols-[5.1rem_1.2rem_1fr] items-center gap-3'
               >
-                <p className='page-three-time font-lora pt-1 text-[1.05rem] font-bold leading-tight text-[#002352]'>
+                <p className='page-three-time font-lora pt-1 text-[1.05rem] xsm:text-[1.25rem] font-bold leading-tight text-[#002352]'>
                   {item.time}
                 </p>
                 <span className='relative z-10 mt-[0.45rem] size-[0.68rem] rounded-full bg-[#C29E4A] shadow-[0_0_0_0.18rem_rgba(194,158,74,0.12)]' />
-                <p className='page-three-title pt-1 font-lora text-[0.75rem]'>{item.title}</p>
+                <p className='page-three-title pt-1 font-lora text-[0.75rem] xsm:text-[0.875rem]'>
+                  {item.title}
+                </p>
               </motion.div>
             ))}
           </motion.div>
