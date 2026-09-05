@@ -86,7 +86,7 @@ const Page4 = () => {
   const rsvpClosed = isRsvpClosed()
 
   return (
-    <section className='relative h-full w-full overflow-hidden bg-[#f8f1e4]'>
+    <section className='page-four relative h-full w-full overflow-hidden bg-[#f8f1e4]'>
       <motion.div
         initial='hidden'
         animate={animateState}
@@ -113,12 +113,12 @@ const Page4 = () => {
         initial='hidden'
         animate={animateState}
         variants={staggerContainer}
-        className='absolute-x-center top-[1.5rem] flex w-[82%] flex-col items-center text-center'
+        className='page-four-content absolute-x-center top-[1.5rem] flex w-[82%] flex-col items-center text-center'
       >
         <Image
           src='/logo-2.png'
           alt='text'
-          className='opacity-30 w-[12.5rem] h-auto object-contain translate-y-[0.5rem]'
+          className='page-four-logo opacity-30 w-[12.5rem] h-auto object-contain translate-y-[0.5rem]'
           width={1000}
           height={1000}
           unoptimized
@@ -126,7 +126,7 @@ const Page4 = () => {
 
         <motion.p
           variants={fadeUp}
-          className='text-[#002352] font-lora text-[1.35rem] font-bold uppercase mt-6'
+          className='page-four-title text-[#002352] font-lora text-[1.35rem] font-bold uppercase mt-6'
         >
           Xác nhận tham dự
         </motion.p>
@@ -136,7 +136,7 @@ const Page4 = () => {
             alt='decor'
             width={800}
             height={800}
-            className='mx-auto mt-4 h-auto w-[8rem] object-contain'
+            className='page-four-decor mx-auto mt-4 h-auto w-[8rem] object-contain'
           />
         </motion.div>
 
@@ -144,7 +144,7 @@ const Page4 = () => {
           <>
             <motion.p
               variants={fadeUp}
-              className='mt-6 font-lora text-[0.9rem] leading-relaxed text-[#5b3d19]'
+              className='page-four-copy mt-6 font-lora text-[0.9rem] leading-relaxed text-[#5b3d19]'
             >
               Kính mời{' '}
               <span className='font-bold text-[#002352]'>
@@ -155,12 +155,12 @@ const Page4 = () => {
 
             <motion.div
               variants={fadeUp}
-              className='mt-6 flex justify-center gap-2 text-[#bb934f]'
+              className='page-four-countdown mt-6 flex justify-center gap-2 text-[#bb934f]'
             >
               {UNITS.map(({ key, label }) => (
                 <div
                   key={key}
-                  className='flex w-[3.5rem] flex-col items-center rounded-lg border border-[#bb934f]/40 bg-white/50 py-2'
+                  className='page-four-unit flex w-[3.5rem] flex-col items-center rounded-lg border border-[#bb934f]/40 bg-white/50 py-2'
                 >
                   <span className='font-noto-serif text-[1.6rem] font-bold leading-none tabular-nums'>
                     {remaining
@@ -178,7 +178,7 @@ const Page4 = () => {
 
             <motion.div
               variants={fadeUp}
-              className='mt-6 flex w-[18rem] flex-col gap-2'
+              className='page-four-actions mt-6 flex w-[18rem] flex-col gap-2'
             >
               <button
                 type='button'

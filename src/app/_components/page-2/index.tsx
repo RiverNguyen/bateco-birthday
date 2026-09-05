@@ -31,7 +31,7 @@ const Page2 = () => {
   const animateState = revealed ? 'show' : 'hidden'
 
   return (
-    <section className='relative h-full w-full overflow-hidden bg-[#f8f1e4] pointer-events-auto'>
+    <section className='page-two relative h-full w-full overflow-hidden bg-[#f8f1e4] pointer-events-auto'>
       <motion.div
         initial='hidden'
         animate={animateState}
@@ -84,23 +84,23 @@ const Page2 = () => {
         initial='hidden'
         animate={animateState}
         variants={staggerContainer}
-        className='absolute-x-center relative z-10 w-[82%] translate-y-16 text-center'
+        className='page-two-content absolute-x-center relative z-10 w-[82%] translate-y-16 text-center'
       >
         <motion.p
           variants={fadeUp}
-          className='text-[#002352] font-lora text-[1.5rem] font-bold uppercase'
+          className='page-two-brand text-[#002352] font-lora text-[1.5rem] font-bold uppercase'
         >
           Tập đoàn Bateco
         </motion.p>
         <motion.p
           variants={fadeUp}
-          className='text-[#002352] font-lora text-[1rem] font-bold uppercase'
+          className='page-two-kicker text-[#002352] font-lora text-[1rem] font-bold uppercase'
         >
           Trân trọng kính mời
         </motion.p>
         <motion.p
           variants={fadeUp}
-          className='font-style-script mt-4 text-[1.875rem]'
+          className='page-two-guest font-style-script mt-4 text-[1.875rem]'
           style={{ fontFamily: "'Style Script', cursive", fontWeight: 400 }}
         >
           {guestName}
@@ -108,7 +108,7 @@ const Page2 = () => {
         {guestSubtitle.length > 0 && (
           <motion.p
             variants={fadeUp}
-            className='font-lora text-[0.75rem]'
+            className='page-two-subtitle font-lora text-[0.75rem]'
           >
             {guestSubtitle.map((line, index) => (
               <span key={line}>
@@ -121,7 +121,7 @@ const Page2 = () => {
         {guestPartner && (
           <motion.p
             variants={fadeUp}
-            className='font-style-script text-[1.875rem] mt-1'
+            className='page-two-partner font-style-script text-[1.875rem] mt-1'
             style={{ fontFamily: "'Style Script', cursive", fontWeight: 400 }}
           >
             cùng {guestPartner}
@@ -129,7 +129,7 @@ const Page2 = () => {
         )}
         <motion.div
           variants={fadeUp}
-          className='flex gap-2 justify-center mt-8'
+          className='page-two-section-title flex gap-2 justify-center mt-8'
         >
           <Image
             src='/line.png'
@@ -149,7 +149,7 @@ const Page2 = () => {
         </motion.div>
         <motion.p
           variants={fadeUp}
-          className='text-[#002352] font-lora text-[1.25rem] font-bold uppercase mt-4'
+          className='page-two-event-title text-[#002352] font-lora text-[1.25rem] font-bold uppercase mt-4'
         >
           LỄ KỶ NIỆM 14 NĂM <br /> THÀNH LẬP TẬP ĐOÀN BATECO
         </motion.p>
@@ -165,19 +165,19 @@ const Page2 = () => {
 
         <motion.div
           variants={staggerContainer}
-          className='flex flex-col items-center justify-center mt-4'
+          className='page-two-date-block flex flex-col items-center justify-center mt-4'
         >
           <motion.p
             variants={fadeUp}
-            className='text-[#002352] font-lora text-[1.25rem] font-bold uppercase'
+            className='page-two-month text-[#002352] font-lora text-[1.25rem] font-bold uppercase'
           >
             THÁNG 9
           </motion.p>
           <motion.div
             variants={fadeUp}
-            className='flex justify-center items-center gap-4 translate-x-3'
+            className='page-two-date-row flex justify-center items-center gap-4 translate-x-3'
           >
-            <p className='text-[#002352] font-lora text-[1.25rem] font-bold uppercase pr-2 border-r-2 border-[#C29E4A]'>
+            <p className='page-two-weekday text-[#002352] font-lora text-[1.25rem] font-bold uppercase pr-2 border-r-2 border-[#C29E4A]'>
               Thứ 7
             </p>
             <motion.p
@@ -189,17 +189,17 @@ const Page2 = () => {
                   transition: { type: 'spring', stiffness: 260, damping: 16, delay: 0.15 },
                 },
               }}
-              className='text-[#C29E4A] text-[2.5rem] font-bold'
+              className='page-two-day text-[#C29E4A] text-[2.5rem] font-bold'
             >
               19
             </motion.p>
-            <p className='text-[#002352] font-lora text-[1.25rem] font-bold uppercase pl-2 border-l-2 border-[#C29E4A]'>
+            <p className='page-two-time text-[#002352] font-lora text-[1.25rem] font-bold uppercase pl-2 border-l-2 border-[#C29E4A]'>
               11:30 AM
             </p>
           </motion.div>
           <motion.p
             variants={fadeUp}
-            className='text-[#002352] font-lora text-[1.25rem] font-bold uppercase -translate-x-1'
+            className='page-two-year text-[#002352] font-lora text-[1.25rem] font-bold uppercase -translate-x-1'
           >
             2026
           </motion.p>
@@ -225,7 +225,7 @@ const Page2 = () => {
           </motion.div>
           <motion.div
             variants={fadeUp}
-            className='flex items-center justify-center gap-2 mt-6'
+            className='page-two-location flex items-center justify-center gap-2 mt-6'
           >
             <MapPinIcon className='size-6 text-[#C29E4A]' />
             <Link

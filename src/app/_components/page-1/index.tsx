@@ -54,7 +54,7 @@ const Page1 = () => {
         />
       </motion.div>
 
-      <h1 className='font-lora text-[1.5rem] font-bold uppercase leading-relaxed text-[#002352] absolute-x-center top-[1.875rem] whitespace-nowrap'>
+      <h1 className='page-one-title font-lora text-[1.5rem] font-bold uppercase leading-relaxed text-[#002352] absolute-x-center top-[1.875rem] whitespace-nowrap'>
         Tập đoàn Bateco
       </h1>
       <motion.div
