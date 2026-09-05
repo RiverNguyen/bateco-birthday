@@ -270,25 +270,25 @@ body {
   }
 
   .page-two-brand {
-    font-size: 1.22rem;
+    font-size: 1.16rem;
     line-height: 1.2;
   }
 
   .page-two-kicker {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     line-height: 1.2;
   }
 
   .page-two-guest,
   .page-two-partner {
     margin-top: 0.35rem;
-    font-size: 1.36rem;
+    font-size: 1.28rem;
     line-height: 1.08;
     overflow-wrap: anywhere;
   }
 
   .page-two-subtitle {
-    font-size: 0.6rem;
+    font-size: 0.56rem;
     line-height: 1.25;
     overflow-wrap: anywhere;
   }
@@ -304,13 +304,13 @@ body {
   }
 
   .page-two-section-title p {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     line-height: 1.1;
   }
 
   .page-two-event-title {
     margin-top: 0.6rem;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1.18;
     overflow-wrap: anywhere;
   }
@@ -328,7 +328,7 @@ body {
   .page-two-weekday,
   .page-two-time,
   .page-two-year {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     line-height: 1.05;
     white-space: nowrap;
   }
@@ -339,7 +339,7 @@ body {
   }
 
   .page-two-day {
-    font-size: 1.8rem;
+    font-size: 1.68rem;
     line-height: 1;
     white-space: nowrap;
   }
@@ -355,7 +355,7 @@ body {
   }
 
   .page-two-location-title p {
-    font-size: 0.7rem;
+    font-size: 0.66rem;
     line-height: 1.1;
     white-space: nowrap;
   }
@@ -371,13 +371,13 @@ body {
   }
 
   .page-two-location a {
-    font-size: 0.58rem;
+    font-size: 0.54rem;
     line-height: 1.25;
     overflow-wrap: anywhere;
   }
 
   .page-two-location a span {
-    font-size: 0.78rem;
+    font-size: 0.72rem;
   }
 
   .page-three-header {
@@ -385,7 +385,7 @@ body {
   }
 
   .page-three-header p {
-    font-size: 1.22rem;
+    font-size: 1.16rem;
     line-height: 1.22;
   }
 
@@ -414,12 +414,12 @@ body {
   }
 
   .page-three-time {
-    font-size: 0.9rem;
+    font-size: 0.86rem;
     line-height: 1;
   }
 
   .page-three-title {
-    font-size: 0.62rem;
+    font-size: 0.58rem;
     line-height: 1.15;
     overflow-wrap: anywhere;
   }
