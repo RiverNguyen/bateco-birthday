@@ -84,7 +84,7 @@ const Page2 = () => {
         initial='hidden'
         animate={animateState}
         variants={staggerContainer}
-        className='page-two-content absolute-x-center relative z-10 w-[82%] translate-y-16 text-center'
+        className='page-two-content absolute left-1/2 top-[4rem] z-10 w-[82%] -translate-x-1/2 text-center'
       >
         <motion.p
           variants={fadeUp}
@@ -159,7 +159,7 @@ const Page2 = () => {
             alt='decor'
             width={800}
             height={800}
-            className='w-[8rem] h-auto object-contain mt-4 mx-auto'
+            className='page-two-mid-decor w-[8rem] h-auto object-contain mt-4 mx-auto'
           />
         </motion.div>
 
@@ -205,7 +205,7 @@ const Page2 = () => {
           </motion.p>
           <motion.div
             variants={fadeUp}
-            className='flex gap-2 justify-center mt-8'
+            className='page-two-location-title flex gap-2 justify-center mt-8'
           >
             <Image
               src='/line.png'
