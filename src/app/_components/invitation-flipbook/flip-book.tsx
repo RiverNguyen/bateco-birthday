@@ -13,7 +13,7 @@ import Page1 from '@/app/_components/page-1'
 import Page2 from '@/app/_components/page-2'
 import Page3 from '@/app/_components/page-3'
 import Page4 from '@/app/_components/page-4'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
 type PageFlipHandle = {
@@ -62,15 +62,19 @@ const isTypingTarget = (target: EventTarget | null) =>
   )
 
 /**
- * A real page-turning book via react-pageflip, at every screen size. The library
- * itself decides — from the actual rendered width vs. page size — whether to show
- * a single page (portrait) or a two-page spread (landscape); we don't force either.
+ * A real page-turning book via react-pageflip, with explicit viewport modes.
+ * Mobile/tablet stay as one portrait card; desktop is the only two-page spread.
  */
 const FlipBook = () => {
   const bookRef = useRef<PageFlipHandle>(null)
+  const isMobile = useIsMobile()
+  const isTablet = useIsTablet()
+  const isCompactBook = isMobile || isTablet
   const [activePage, setActivePage] = useState(0)
   const [pageState, setPageState] = useState('read')
-  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('landscape')
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
+    isCompactBook ? 'portrait' : 'landscape',
+  )
   const bookPageSize = useBookPageSize()
 
   // react-pageflip không báo hướng lật (tới/lui) qua bất kỳ event nào — nhưng vùng
@@ -95,9 +99,8 @@ const FlipBook = () => {
   const handlePointerEnd = () => {
     pointerStartXRef.current = null
   }
-  // Mobile: thêm trang 4 (xác nhận tham dự) vào cuốn thiệp, cùng hiệu ứng lật.
-  const isMobile = useIsMobile()
-  const pages = isMobile ? mobilePages : basePages
+  // Mobile/tablet: thêm trang 4 (xác nhận tham dự) vào cuốn thiệp, cùng hiệu ứng lật.
+  const pages = isCompactBook ? mobilePages : basePages
   const canFlipPrev = activePage > 0 && pageState === 'read'
   const canFlipNext = activePage < pages.length - 1 && pageState === 'read'
 
@@ -122,7 +125,13 @@ const FlipBook = () => {
   }, [])
 
   useEffect(() => {
-    if (isMobile) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOrientation(isCompactBook ? 'portrait' : 'landscape')
+    setActivePage((currentPage) => Math.min(currentPage, pages.length - 1))
+  }, [isCompactBook, pages.length])
+
+  useEffect(() => {
+    if (isCompactBook) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
@@ -148,7 +157,7 @@ const FlipBook = () => {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [flipNext, flipPrev, isMobile])
+  }, [flipNext, flipPrev, isCompactBook])
 
   return (
     <>
@@ -177,6 +186,7 @@ const FlipBook = () => {
               >
                 {mounted && bookPageSize.width > 0 && (
                   <HTMLFlipBook
+                    key={isCompactBook ? 'compact-book' : 'desktop-book'}
                     ref={bookRef}
                     className={cn('invitation-book', pageState === 'fold_corner' && 'cursor-grab')}
                     style={{}}
@@ -189,17 +199,17 @@ const FlipBook = () => {
                     size='stretch'
                     startPage={0}
                     drawShadow
-                    flippingTime={isMobile ? 700 : 900}
-                    usePortrait
+                    flippingTime={isCompactBook ? 700 : 900}
+                    usePortrait={isCompactBook}
                     startZIndex={30}
                     autoSize
                     maxShadowOpacity={0.86}
-                    showCover={!isMobile}
+                    showCover={!isCompactBook}
                     mobileScrollSupport={false}
                     clickEventForward
                     useMouseEvents
                     swipeDistance={8}
-                    showPageCorners={!isMobile}
+                    showPageCorners={!isCompactBook}
                     disableFlipByClick={false}
                     onFlip={(event) => setActivePage(Number(event.data))}
                     onChangeState={(event) => setPageState(String(event.data))}
@@ -227,13 +237,13 @@ const FlipBook = () => {
       </ActivePageProvider>
       <p
         className={cn(
-          'text-[#bb934f] text-[1rem] font-semibold opacity-0 transition-opacity duration-300 ease-out xsm:hidden',
+          'text-[#bb934f] text-[1rem] font-semibold opacity-0 transition-opacity duration-300 ease-out xlg:hidden',
           activePage === 0 && 'opacity-100',
         )}
       >
         Click hoặc vuốt màn hình để xem thiệp
       </p>
-      <div className='hidden items-center justify-center gap-3 xsm:flex'>
+      <div className='compact-book-controls hidden items-center justify-center gap-3 xlg:flex'>
         <button
           type='button'
           aria-label='Trang trước'

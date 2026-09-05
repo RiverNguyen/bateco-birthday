@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 const ActivePageContext = createContext(0)
 
@@ -44,9 +44,11 @@ export function useBookOrientation() {
 export function useRevealOnce(isActive: boolean) {
   const [revealed, setRevealed] = useState(isActive)
 
-  if (isActive && !revealed) {
+  useEffect(() => {
+    if (!isActive) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRevealed(true)
-  }
+  }, [isActive])
 
   return revealed
 }

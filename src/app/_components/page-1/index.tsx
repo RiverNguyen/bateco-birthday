@@ -15,7 +15,7 @@ const Page1 = () => {
   const revealed = useRevealOnce(isActive)
 
   return (
-    <section className='relative h-full w-full overflow-hidden bg-[#f7f0df]'>
+    <section className='page-one relative h-full w-full overflow-hidden bg-[#f7f0df]'>
       <motion.div
         initial='hidden'
         animate={revealed ? 'show' : 'hidden'}
@@ -42,7 +42,7 @@ const Page1 = () => {
         initial='hidden'
         animate={revealed ? 'show' : 'hidden'}
         variants={scaleIn}
-        className='absolute-x-center top-[6.25rem] w-[14.25rem]'
+        className='page-one-logo absolute-x-center top-[6.25rem] w-[14.25rem]'
       >
         <Image
           src='/logo.svg'
@@ -64,7 +64,7 @@ const Page1 = () => {
           hidden: {},
           show: { transition: { staggerChildren: 0.16, delayChildren: 0.55 } },
         }}
-        className='absolute-x-center top-[21rem] w-[82%] text-center'
+        className='page-one-main-copy absolute-x-center top-[21rem] w-[82%] text-center'
       >
         <motion.h2
           variants={fadeUp}
@@ -93,7 +93,7 @@ const Page1 = () => {
         initial='hidden'
         animate={revealed ? 'show' : 'hidden'}
         variants={withDelay(riseFromBottom, 0.3)}
-        className='absolute -bottom-10 left-0 w-full z-[1]'
+        className='page-one-bottom-decor absolute -bottom-10 left-0 w-full z-[1]'
       >
         <Image
           src='/decor-4.png'
@@ -107,7 +107,7 @@ const Page1 = () => {
         initial='hidden'
         animate={revealed ? 'show' : 'hidden'}
         variants={withDelay(riseFromBottom, 0.45)}
-        className='absolute -bottom-2 left-0 w-[20rem]'
+        className='page-one-tower absolute -bottom-2 left-0 w-[20rem]'
       >
         <Image
           src='/tower.svg'

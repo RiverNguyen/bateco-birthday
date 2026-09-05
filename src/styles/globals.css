@@ -68,11 +68,27 @@ html {
   font-size: 1vw;
 }
 
+@media (min-width: 640px) and (max-width: 1024px) {
+  html {
+    /* Tablet dùng layout 1 trang giống mobile nhưng vẫn tận dụng màn hình lớn hơn.
+       Cap theo chiều cao để iPad landscape và các màn tỉ lệ thấp không tràn viewport. */
+    font-size: min(2.45vw, calc((100svh - 32px) / 51));
+  }
+}
+
 @media (max-width: 639px) {
   html {
     /* Mobile có thêm cụm nút prev/next dưới thiệp, nên rem phải scale theo tổng
        chiều cao của cả thiệp + controls, không chỉ riêng trang 24 × 47rem. */
     font-size: min(4vw, calc((100svh - 24px) / 51));
+  }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
+  html {
+    /* Landscape thấp quá ít chiều cao để đặt controls dưới thiệp. Cho controls nổi
+       lên nền và để thiệp dùng gần trọn chiều cao màn. */
+    font-size: min(2.45vw, calc((100svh - 12px) / 47));
   }
 }
 
@@ -215,11 +231,60 @@ body {
   filter: blur(0.08rem);
 }
 
-/* Điện thoại (< 640px) luôn quá hẹp để react-pageflip hiện 2 trang cạnh nhau, nên
-   khung container ở đây khớp sẵn theo tỉ lệ 1 trang — không "ép" gì cả, thư viện
-   vẫn tự quyết định portrait/landscape theo mặc định, chỉ là trên điện thoại kết
-   quả luôn là portrait. Tablet trở lên dùng chung rule `.book-shell` phía trên,
-   để thư viện tự chọn 1 hay 2 trang tuỳ độ rộng thực tế, y như desktop. */
+/* Tablet/mobile (< 1025px) dùng layout compact 1 trang; desktop mới là spread 2 trang.
+   Như vậy tablet không bị biến thành desktop chỉ vì tỉ lệ viewport đủ rộng. */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .invitation-stage::after {
+    inset: 0.9rem;
+  }
+
+  .book-shell {
+    width: min(100%, 24rem, calc((100svh - 5.75rem) * 24 / 47));
+    aspect-ratio: 24 / 47;
+  }
+
+  .book-shell::before {
+    display: none;
+  }
+
+  .invitation-book {
+    filter: drop-shadow(0 0.8rem 1.15rem rgba(15, 9, 2, 0.18));
+  }
+
+  .invitation-flip-page::before,
+  .invitation-flip-page::after {
+    display: none;
+  }
+
+  .invitation-book .stf__innerShadow,
+  .invitation-book .stf__hardInnerShadow {
+    filter: blur(0.08rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg) contrast(1.1);
+  }
+
+  .book-shell[data-flip-direction='forward'] .invitation-book .stf__innerShadow,
+  .book-shell[data-flip-direction='forward'] .invitation-book .stf__hardInnerShadow {
+    background-color: #f8f1e4 !important;
+  }
+
+  .invitation-book .stf__outerShadow,
+  .invitation-book .stf__hardShadow {
+    filter: blur(0.5rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg);
+  }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
+  .book-shell {
+    width: min(100%, 24rem, calc((100svh - 1rem) * 24 / 47));
+  }
+
+  .compact-book-controls {
+    position: absolute;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    z-index: 90;
+  }
+}
+
 @media (max-width: 639px) {
   .invitation-stage::after {
     inset: 0.75rem;
@@ -281,6 +346,40 @@ body {
     /* Bóng "ngoài" là bóng đổ của góc trang đang lật xuống mặt giấy bên dưới —
        đổ bóng thật ngoài đời vốn mềm/loang, nên làm mờ nhiều hơn hẳn bóng trong. */
     filter: blur(0.5rem) sepia(0.7) saturate(1.8) hue-rotate(-8deg);
+  }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 520px) {
+  .book-shell {
+    width: min(100%, 24rem, calc((100svh - 1rem) * 24 / 47));
+  }
+
+  .page-one-logo {
+    top: 5rem;
+    width: 12.5rem;
+  }
+
+  .page-one-main-copy {
+    top: 17rem;
+  }
+
+  .page-one-main-copy h2 {
+    font-size: 2.15rem;
+  }
+
+  .page-one-main-copy p {
+    margin-top: 0.35rem;
+    font-size: 1.35rem;
+    line-height: 1.3;
+  }
+
+  .page-one-bottom-decor {
+    bottom: -5.5rem;
+  }
+
+  .page-one-tower {
+    bottom: -1.25rem;
+    width: 16rem;
   }
 }
 

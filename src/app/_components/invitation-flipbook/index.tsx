@@ -5,16 +5,18 @@ import Image from 'next/image'
 import Countdown from '@/app/_components/invitation-flipbook/countdown'
 import FlipBook from '@/app/_components/invitation-flipbook/flip-book'
 import { GuestProvider } from '@/app/_components/invitation-flipbook/guest-context'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile'
 import type { Guest } from '@/lib/guest'
 
 const InvitationFlipbook = ({ guest }: { guest?: Guest | null }) => {
-  // Mobile: phần xác nhận nằm ở trang 4 của thiệp, không dùng cột đếm ngược bên phải.
+  // Mobile/tablet: phần xác nhận nằm ở trang 4 của thiệp, không dùng cột đếm ngược bên phải.
   const isMobile = useIsMobile()
+  const isTablet = useIsTablet()
+  const isCompactBook = isMobile || isTablet
 
   return (
     <GuestProvider value={guest ?? null}>
-      <section className='invitation-stage relative flex min-h-svh overflow-hidden pt-[2rem] text-[#5b3d19] xsm:h-svh xsm:min-h-0 xsm:pt-[0.75rem]'>
+      <section className='invitation-stage relative flex min-h-svh overflow-hidden pt-[2rem] text-[#5b3d19] xlg:h-svh xlg:min-h-0 xlg:pt-[0.75rem]'>
         <Image
           src='/bg-new.png'
           alt='Background'
@@ -39,7 +41,7 @@ const InvitationFlipbook = ({ guest }: { guest?: Guest | null }) => {
           height={1000}
           unoptimized
         />
-        <div className='absolute-y-center left-0 flex xsm:hidden'>
+        <div className='absolute-y-center left-0 flex xlg:hidden'>
           <Image
             src='/14-2.webp'
             alt='14-2'
@@ -66,10 +68,10 @@ const InvitationFlipbook = ({ guest }: { guest?: Guest | null }) => {
           height={1000}
           unoptimized
         />
-        <div className='relative mx-auto flex w-full max-w-[78rem] flex-col items-center justify-center gap-5 xsm:h-full xsm:max-w-full xsm:gap-2'>
+        <div className='relative mx-auto flex w-full max-w-[78rem] flex-col items-center justify-center gap-5 xlg:h-full xlg:max-w-full xlg:gap-2'>
           <FlipBook />
         </div>
-        {!isMobile && <Countdown />}
+        {!isCompactBook && <Countdown />}
       </section>
     </GuestProvider>
   )
