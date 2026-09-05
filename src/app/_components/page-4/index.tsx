@@ -52,8 +52,9 @@ const Page4 = () => {
     return () => clearInterval(timer)
   }, [])
 
-  const submit = async (partySize: number) => {
+  const submit = async () => {
     if (!guest || saving) return
+    const partySize = 1
     setSaving(true)
     try {
       const response = await fetch('/api/rsvp', {
@@ -150,7 +151,8 @@ const Page4 = () => {
               <span className='font-bold text-[#002352]'>
                 {[guest.honorific, guest.name].filter(Boolean).join(' ')}
               </span>
-              {guest.partner ? ` cùng ${guest.partner}` : ''} xác nhận tham dự.
+              {' '}
+              xác nhận tham dự.
             </motion.p>
 
             <motion.div
@@ -183,7 +185,7 @@ const Page4 = () => {
               <button
                 type='button'
                 disabled={saving || rsvpClosed}
-                onClick={() => void submit(1)}
+                onClick={() => void submit()}
                 className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[0.8rem] text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
                   confirmed === 1
                     ? 'bg-[#8a6a2f] ring-2 ring-[#bb934f]'
@@ -191,24 +193,8 @@ const Page4 = () => {
                 }`}
               >
                 {confirmed === 1 && <CheckCircleIcon className='h-4 w-4' />}
-                Xác nhận bản thân tham gia
+                Xác nhận tham gia
               </button>
-
-              {guest.partner && (
-                <button
-                  type='button'
-                  disabled={saving || rsvpClosed}
-                  onClick={() => void submit(2)}
-                  className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[0.8rem] text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                    confirmed === 2
-                      ? 'bg-[#6b0106] ring-2 ring-[#9d0208]'
-                      : 'bg-[#9d0208] hover:bg-[#9d0208]/85'
-                  }`}
-                >
-                  {confirmed === 2 && <CheckCircleIcon className='h-4 w-4' />}
-                  Xác nhận tham gia cùng {guest.partner.toLowerCase()}
-                </button>
-              )}
 
               <p className='font-lora mt-1 text-[0.7rem] leading-snug text-[#5b3d19]'>
                 {rsvpClosed ? (

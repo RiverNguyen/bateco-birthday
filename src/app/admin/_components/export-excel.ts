@@ -31,8 +31,6 @@ const COLS: { key: keyof Row | 'status'; label: string; width: number }[] = [
   { key: 'title', label: 'Chức danh', width: 34 },
   { key: 'unit', label: 'Đơn vị', width: 28 },
   { key: 'department', label: 'Bộ phận', width: 16 },
-  { key: 'partner', label: 'Đi cùng', width: 12 },
-  { key: 'partySize', label: 'Số người tham gia', width: 16 },
   { key: 'status', label: 'Trạng thái', width: 16 },
   { key: 'link', label: 'Link thiệp', width: 46 },
 ]
@@ -70,7 +68,6 @@ const buildSheet = (rows: Row[], title: string): XLSX.WorkSheet => {
     ...rows.map((row) =>
       COLS.map((col) => {
         if (col.key === 'status') return row.partySize === null ? 'Chưa xác nhận' : 'Đã xác nhận'
-        if (col.key === 'partySize') return row.partySize ?? ''
         if (col.key === 'stt') return row.stt
         const value = row[col.key as keyof Row]
         return value ?? ''
@@ -102,7 +99,7 @@ const buildSheet = (rows: Row[], title: string): XLSX.WorkSheet => {
     COLS.forEach((col, c) => {
       const cell = at(r, c)
       if (!cell) return
-      const center = col.key === 'stt' || col.key === 'partySize' || col.key === 'status'
+      const center = col.key === 'stt' || col.key === 'status'
       const extra: Record<string, unknown> = {}
       if (center) extra.alignment = { horizontal: 'center', vertical: 'center' }
       if (col.key === 'name') extra.font = { sz: 10, bold: true }
@@ -138,14 +135,14 @@ const summarySheet = (rows: Row[]): XLSX.WorkSheet => {
       list.length,
       confirmed.length,
       list.length - confirmed.length,
-      confirmed.reduce((s, r) => s + (r.partySize ?? 0), 0),
+      confirmed.length,
     ]
   }
 
   const aoa: unknown[][] = [
     ['TỔNG HỢP XÁC NHẬN THAM DỰ'],
     [],
-    ['Nhóm', 'Số khách', 'Đã xác nhận', 'Chưa xác nhận', 'Tổng số người dự'],
+    ['Nhóm', 'Số thiệp', 'Đã xác nhận', 'Chưa xác nhận', 'Số người đã xác nhận'],
     ...[...byCat.entries()].map(([label, list]) => line(label, list)),
     line('TỔNG CỘNG', rows),
   ]

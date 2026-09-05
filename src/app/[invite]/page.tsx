@@ -15,10 +15,8 @@ type InvitePageProps = {
 const findGuest = (slug: string) =>
   prisma.guest.findUnique({ where: { slug: decodeURIComponent(slug) } }).catch(() => null)
 
-const guestLine = (g: { honorific: string | null; name: string; partner: string | null }) => {
-  const who = [g.honorific, g.name].filter(Boolean).join(' ')
-  return g.partner ? `${who} cùng ${g.partner}` : who
-}
+const guestLine = (g: { honorific: string | null; name: string }) =>
+  [g.honorific, g.name].filter(Boolean).join(' ')
 
 export async function generateMetadata({ params }: InvitePageProps): Promise<Metadata> {
   const { invite } = await params

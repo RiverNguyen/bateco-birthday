@@ -24,8 +24,6 @@ const Page2 = () => {
       ? [guest.title].filter(Boolean)
       : [guest.title, [guest.unit, guest.department].filter(Boolean).join(' - ')].filter(Boolean)
     : ['Nguyên Chánh văn phòng', 'Tập đoàn Công nghiệp Than - Khoáng sản Việt Nam']
-  const guestPartner = guest ? guest.partner : 'Phu nhân'
-
   const isActive = useIsActivePage(FLIP_STATE.spread)
   const revealed = useRevealOnce(isActive)
   const animateState = revealed ? 'show' : 'hidden'
@@ -116,15 +114,6 @@ const Page2 = () => {
                 {line}
               </span>
             ))}
-          </motion.p>
-        )}
-        {guestPartner && (
-          <motion.p
-            variants={fadeUp}
-            className='page-two-partner font-style-script text-[1.875rem] mt-1'
-            style={{ fontFamily: "'Style Script', cursive", fontWeight: 400 }}
-          >
-            cùng {guestPartner}
           </motion.p>
         )}
         <motion.div

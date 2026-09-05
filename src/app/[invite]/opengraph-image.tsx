@@ -27,7 +27,7 @@ export default async function OgImage({ params }: Params) {
       <OgCard
         who={who}
         title={guest?.title ?? undefined}
-        partner={guest?.partner ? `cùng ${guest.partner}` : undefined}
+        partner={undefined}
         big={Boolean(guest)}
         assets={assets}
       />

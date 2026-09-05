@@ -7,23 +7,22 @@ import * as XLSX from 'xlsx'
 import GuestTable, { type GuestRow } from '@/app/admin/_components/guest-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { baseInviteSlug, inviteUrl, type Guest } from '@/lib/guest'
+import { inviteUrl, uniqueInviteSlug, type Guest } from '@/lib/guest'
 import {
   LINK_HEADER,
-  detectColumns,
+  PARTNER_LINK_HEADER,
   findHeaderRow,
   normalizeHeader,
   parseSheetMatrix,
-  readGuestRow,
   sheetHasGuestList,
 } from '@/lib/guest-excel'
 
-/** Chỉ lấy 2 tab: "Nội bộ" và "Khách" (khớp không phân biệt dấu/hoa thường). */
-const categoryOfSheet = (sheetName: string): string | null => {
+/** Ưu tiên tên nhóm quen thuộc, còn lại dùng chính tên sheet có danh sách khách. */
+const categoryOfSheet = (sheetName: string): string => {
   const n = normalizeHeader(sheetName)
   if (n.includes('noi bo')) return 'Nội bộ'
   if (n.includes('khach')) return 'Khách'
-  return null
+  return sheetName
 }
 
 const parseGuests = (data: ArrayBuffer): Guest[] => {
@@ -31,7 +30,6 @@ const parseGuests = (data: ArrayBuffer): Guest[] => {
   const all: Guest[] = []
   for (const sheetName of workbook.SheetNames) {
     const category = categoryOfSheet(sheetName)
-    if (!category) continue
     const matrix = XLSX.utils.sheet_to_json<unknown[]>(workbook.Sheets[sheetName], {
       header: 1,
       blankrows: false,
@@ -127,26 +125,33 @@ const AdminPage = () => {
   const downloadExcelWithLinks = () => {
     if (!bufferRef.current) return
     const workbook = XLSX.read(bufferRef.current, { type: 'array' })
+    const takenSlugs = new Set<string>()
 
     for (const sheetName of workbook.SheetNames) {
       const category = categoryOfSheet(sheetName)
-      if (!category) continue
       const sheet = workbook.Sheets[sheetName]
       const matrix = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1 })
       const headerRowIndex = findHeaderRow(matrix)
       if (headerRowIndex === -1) continue
-      const columnIndex = detectColumns(matrix[headerRowIndex])
       const linkColIndex = matrix[headerRowIndex].length
+      const parsed = parseSheetMatrix(matrix, category)
+      const linksByRow = new Map<number, string[]>()
+      for (const { rowIndex, guest } of parsed.guests) {
+        const link = inviteUrl(uniqueInviteSlug(guest.name, takenSlugs), origin)
+        linksByRow.set(rowIndex, [...(linksByRow.get(rowIndex) ?? []), link])
+      }
 
-      XLSX.utils.sheet_add_aoa(sheet, [[LINK_HEADER]], {
+      XLSX.utils.sheet_add_aoa(sheet, [[LINK_HEADER, PARTNER_LINK_HEADER]], {
         origin: { r: headerRowIndex, c: linkColIndex },
       })
       for (let r = headerRowIndex + 1; r < matrix.length; r += 1) {
-        const guest = readGuestRow(matrix[r] ?? [], columnIndex, category)
-        if (guest) {
-          XLSX.utils.sheet_add_aoa(sheet, [[inviteUrl(baseInviteSlug(guest.name), origin)]], {
-            origin: { r, c: linkColIndex },
-          })
+        const [guestLink, partnerGuestLink] = linksByRow.get(r) ?? []
+        if (guestLink) {
+          XLSX.utils.sheet_add_aoa(
+            sheet,
+            [[guestLink, partnerGuestLink ?? '']],
+            { origin: { r, c: linkColIndex } },
+          )
         }
       }
     }

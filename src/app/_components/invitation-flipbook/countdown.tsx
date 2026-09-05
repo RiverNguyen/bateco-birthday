@@ -42,8 +42,9 @@ const Countdown = () => {
     return () => clearInterval(timer)
   }, [])
 
-  const submit = async (partySize: number) => {
+  const submit = async () => {
     if (!guest || saving) return
+    const partySize = 1
     setSaving(true)
     setError('')
     try {
@@ -105,32 +106,15 @@ const Countdown = () => {
           <button
             type='button'
             disabled={saving || rsvpClosed}
-            onClick={() => void submit(1)}
+            onClick={() => void submit()}
             className={`rounded-lg px-4 py-2 text-left text-[0.75rem] text-white transition-colors duration-300 ease-out hover:cursor-pointer disabled:opacity-60 disabled:hover:cursor-not-allowed flex items-center gap-2 ${
               confirmed === 1
                 ? 'bg-[#8a6a2f] ring-2 ring-[#bb934f]'
                 : 'bg-[#bb934f] hover:bg-[#bb934f]/80'
             }`}
           >
-            {confirmed === 1 ? <CheckCircleIcon className='w-4 h-4' /> : ''}Xác nhận bản thân tham
-            gia
+            {confirmed === 1 ? <CheckCircleIcon className='w-4 h-4' /> : ''}Xác nhận tham gia
           </button>
-
-          {guest.partner && (
-            <button
-              type='button'
-              disabled={saving || rsvpClosed}
-              onClick={() => void submit(2)}
-              className={`rounded-lg px-4 py-2 text-left text-[0.75rem] text-white transition-colors duration-300 ease-out hover:cursor-pointer disabled:opacity-60 disabled:hover:cursor-not-allowed flex items-center mt-1 gap-2 ${
-                confirmed === 2
-                  ? 'bg-[#6b0106] ring-2 ring-[#9d0208]'
-                  : 'bg-[#9d0208] hover:bg-[#9d0208]/80'
-              }`}
-            >
-              {confirmed === 2 ? <CheckCircleIcon className='w-4 h-4' /> : ''}Xác nhận tham gia cùng{' '}
-              {guest.partner.toLowerCase()}
-            </button>
-          )}
 
           <p className='font-lora mt-1 text-[0.7rem] leading-snug text-[#bb934f]'>
             {rsvpClosed ? (

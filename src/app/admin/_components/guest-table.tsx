@@ -115,23 +115,18 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
 
   const stats = useMemo(() => {
     const confirmed = scoped.filter((row) => row.partySize !== null)
-    const solo = confirmed.filter((row) => row.partySize === 1).length
-    const withPartner = confirmed.filter((row) => (row.partySize ?? 0) >= 2).length
     return {
       total: scoped.length,
       confirmed: confirmed.length,
       pending: scoped.length - confirmed.length,
-      people: confirmed.reduce((sum, row) => sum + (row.partySize ?? 0), 0),
-      solo,
-      withPartner,
+      people: confirmed.length,
     }
   }, [scoped])
 
   const chartData = useMemo(
     () => [
       { bucket: 'Chưa xác nhận', count: stats.pending },
-      { bucket: 'Đi một mình', count: stats.solo },
-      { bucket: 'Đi cùng phu nhân/quân', count: stats.withPartner },
+      { bucket: 'Đã xác nhận', count: stats.confirmed },
     ],
     [stats],
   )
@@ -178,7 +173,7 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
           value={stats.pending}
         />
         <StatCard
-          label='Tổng số người dự'
+          label='Số người đã xác nhận'
           value={stats.people}
         />
       </div>
@@ -318,7 +313,7 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
               {showGroupColumn && <TableHead className='w-28'>Nhóm</TableHead>}
               <TableHead>Họ tên</TableHead>
               <TableHead>Link</TableHead>
-              <TableHead className='w-40 text-center'>Số người tham gia</TableHead>
+              <TableHead className='w-40 text-center'>Xác nhận</TableHead>
               <TableHead className='w-32 text-right'>Thao tác</TableHead>
             </TableRow>
           </TableHeader>
@@ -377,7 +372,7 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
                     {row.partySize === null ? (
                       <span className='text-gray-400'>Chưa xác nhận</span>
                     ) : (
-                      <Badge variant='secondary'>{row.partySize} người</Badge>
+                      <Badge variant='secondary'>Đã xác nhận</Badge>
                     )}
                   </TableCell>
                   <TableCell>
@@ -437,7 +432,7 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
           {filtered.length > 0 && (
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={columnCount - 2}>Tổng số người đã xác nhận</TableCell>
+                <TableCell colSpan={columnCount - 2}>Tổng số thiệp đã xác nhận</TableCell>
                 <TableCell className='text-center font-semibold'>{stats.people}</TableCell>
                 <TableCell />
               </TableRow>

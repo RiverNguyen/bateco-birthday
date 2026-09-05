@@ -19,13 +19,13 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => ({}))) as RsvpBody
     const guestId = (body.id ?? '').trim()
     const name = (body.name ?? '').trim()
-    const partySize = Number(body.partySize)
+    const partySize = Number(body.partySize ?? 1)
 
     if (!guestId || !name) {
       return NextResponse.json({ ok: false, error: 'Thiếu thông tin khách.' }, { status: 400 })
     }
-    if (partySize !== 1 && partySize !== 2) {
-      return NextResponse.json({ ok: false, error: 'Số người phải là 1 hoặc 2.' }, { status: 400 })
+    if (partySize !== 1) {
+      return NextResponse.json({ ok: false, error: 'Mỗi thiệp xác nhận cho 1 người.' }, { status: 400 })
     }
     if (isRsvpClosed()) {
       return NextResponse.json(
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       honorific: body.honorific?.trim() || null,
       title: body.title?.trim() || null,
       partySize,
-      withPartner: partySize === 2,
+      withPartner: false,
     }
 
     const rsvp = await prisma.rsvp.upsert({

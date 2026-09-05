@@ -32,7 +32,7 @@ model Rsvp {
   name        String
   honorific   String?
   title       String?
-  /// Số người tham gia: 1 (một mình) hoặc 2 (đi cùng phu nhân/phu quân).
+  /// Số người tham gia theo thiệp. Mô hình hiện tại: 1 thiệp = 1 người.
   partySize   Int
   withPartner Boolean  @default(false)
   createdAt   DateTime @default(now())
