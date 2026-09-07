@@ -16,22 +16,13 @@ const UNITS: { key: keyof Remaining; label: string }[] = [
 
 const pad = (value: number) => String(value).padStart(2, '0')
 
-const storageKey = (id: string) => `rsvp:${id}`
-
 const Countdown = () => {
   const guest = useGuest()
   const id = guest?.id ?? ''
 
   const [remaining, setRemaining] = useState<Remaining | null>(null)
-  const [confirmed, setConfirmed] = useState<number | null>(() => {
-    if (typeof window === 'undefined' || !id) return null
-    try {
-      const stored = window.localStorage.getItem(storageKey(id))
-      return stored ? Number(stored) : null
-    } catch {
-      return null
-    }
-  })
+  const [confirmed, setConfirmed] = useState(false)
+  const [checking, setChecking] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -42,32 +33,60 @@ const Countdown = () => {
     return () => clearInterval(timer)
   }, [])
 
+  useEffect(() => {
+    if (!id) return
+    const controller = new AbortController()
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setChecking(true)
+    setError('')
+
+    fetch(`/api/rsvp?id=${encodeURIComponent(id)}`, {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const result = (await response.json()) as { ok: boolean; confirmed?: boolean }
+        if (!response.ok || !result.ok) throw new Error('Không đọc được xác nhận.')
+        setConfirmed(Boolean(result.confirmed))
+      })
+      .catch((err) => {
+        if ((err as Error).name !== 'AbortError') {
+          setError('Không đọc được xác nhận.')
+          toast.error('Không đọc được xác nhận.')
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setChecking(false)
+      })
+
+    return () => controller.abort()
+  }, [id])
+
   const submit = async () => {
     if (!guest || saving) return
-    const partySize = 1
     setSaving(true)
     setError('')
     try {
-      const response = await fetch('/api/rsvp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id,
-          name: guest.name,
-          honorific: guest.honorific,
-          title: guest.title,
-          partySize,
-        }),
-      })
-      const result = (await response.json()) as { ok: boolean; error?: string }
+      const response = await fetch(
+        confirmed ? `/api/rsvp?id=${encodeURIComponent(id)}` : '/api/rsvp',
+        {
+          method: confirmed ? 'DELETE' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: confirmed
+            ? undefined
+            : JSON.stringify({
+              id,
+              name: guest.name,
+              honorific: guest.honorific,
+              title: guest.title,
+              partySize: 1,
+            }),
+        },
+      )
+      const result = (await response.json()) as { ok: boolean; error?: string; confirmed?: boolean }
       if (!result.ok) throw new Error(result.error ?? 'Lỗi.')
-      setConfirmed(partySize)
-      try {
-        window.localStorage.setItem(storageKey(id), String(partySize))
-        toast.success('Xác nhận thành công.')
-      } catch {
-        toast.error('Không ghi nhận được xác nhận.')
-      }
+      setConfirmed(Boolean(result.confirmed))
+      toast.success(result.confirmed ? 'Xác nhận thành công.' : 'Đã huỷ xác nhận.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Không gửi được xác nhận.')
     } finally {
@@ -105,15 +124,20 @@ const Countdown = () => {
         <div className='flex max-w-[16rem] flex-col gap-1'>
           <button
             type='button'
-            disabled={saving || rsvpClosed}
+            disabled={saving || checking || rsvpClosed}
             onClick={() => void submit()}
             className={`rounded-lg px-4 py-2 text-left text-[0.75rem] text-white transition-colors duration-300 ease-out hover:cursor-pointer disabled:opacity-60 disabled:hover:cursor-not-allowed flex items-center gap-2 ${
-              confirmed === 1
+              confirmed
                 ? 'bg-[#8a6a2f] ring-2 ring-[#bb934f]'
                 : 'bg-[#bb934f] hover:bg-[#bb934f]/80'
             }`}
           >
-            {confirmed === 1 ? <CheckCircleIcon className='w-4 h-4' /> : ''}Xác nhận tham gia
+            {confirmed ? <CheckCircleIcon className='w-4 h-4' /> : ''}
+            {checking
+              ? 'Đang kiểm tra...'
+              : confirmed
+                ? 'Huỷ xác nhận tham gia'
+                : 'Xác nhận tham gia'}
           </button>
 
           <p className='font-lora mt-1 text-[0.7rem] leading-snug text-[#bb934f]'>

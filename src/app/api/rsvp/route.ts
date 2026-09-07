@@ -14,6 +14,9 @@ type RsvpBody = {
   partySize?: number
 }
 
+const guestIdFromUrl = (request: Request) =>
+  new URL(request.url).searchParams.get('id')?.trim() ?? ''
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json().catch(() => ({}))) as RsvpBody
@@ -25,7 +28,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Thiếu thông tin khách.' }, { status: 400 })
     }
     if (partySize !== 1) {
-      return NextResponse.json({ ok: false, error: 'Mỗi thiệp xác nhận cho 1 người.' }, { status: 400 })
+      return NextResponse.json(
+        { ok: false, error: 'Mỗi thiệp xác nhận cho 1 người.' },
+        { status: 400 },
+      )
     }
     if (isRsvpClosed()) {
       return NextResponse.json(
@@ -48,20 +54,47 @@ export async function POST(request: Request) {
       update: data,
     })
 
-    return NextResponse.json({ ok: true, rsvp })
+    return NextResponse.json({ ok: true, confirmed: true, rsvp })
   } catch (error) {
     console.error('[rsvp] POST failed:', error)
     return NextResponse.json({ ok: false, error: 'Không lưu được xác nhận.' }, { status: 500 })
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const guestId = guestIdFromUrl(request)
+    if (guestId) {
+      const rsvp = await prisma.rsvp.findUnique({ where: { guestId } })
+      return NextResponse.json({ ok: true, confirmed: Boolean(rsvp), rsvp })
+    }
+
     const rsvps = await prisma.rsvp.findMany({ orderBy: { createdAt: 'asc' } })
     const totalGuests = rsvps.reduce((sum, rsvp) => sum + rsvp.partySize, 0)
     return NextResponse.json({ ok: true, count: rsvps.length, totalGuests, rsvps })
   } catch (error) {
     console.error('[rsvp] GET failed:', error)
     return NextResponse.json({ ok: false, error: 'Không đọc được danh sách.' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const guestId = guestIdFromUrl(request)
+    if (!guestId) {
+      return NextResponse.json({ ok: false, error: 'Thiếu thông tin khách.' }, { status: 400 })
+    }
+    if (isRsvpClosed()) {
+      return NextResponse.json(
+        { ok: false, error: `Đã hết hạn xác nhận (${formatDeadline()}).` },
+        { status: 403 },
+      )
+    }
+
+    await prisma.rsvp.deleteMany({ where: { guestId } })
+    return NextResponse.json({ ok: true, confirmed: false })
+  } catch (error) {
+    console.error('[rsvp] DELETE failed:', error)
+    return NextResponse.json({ ok: false, error: 'Không huỷ được xác nhận.' }, { status: 500 })
   }
 }
