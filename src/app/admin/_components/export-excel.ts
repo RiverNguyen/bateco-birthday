@@ -15,6 +15,19 @@ type Row = {
   confirmedAt: string | null
 }
 
+type ExportRow = {
+  stt: number
+  honorific: string
+  name: string
+  title: string
+  status: string
+  link: string
+  spouseHonorific: string
+  spouseName: string
+  spouseLink: string
+  spouseStatus: string
+}
+
 const NAVY = '002352'
 const GOLD = 'C29E4A'
 const HEADER_FILL = '002352'
@@ -24,15 +37,17 @@ const BORDER = 'D9D2C0'
 const thin = { style: 'thin', color: { rgb: BORDER } } as const
 const allBorders = { top: thin, bottom: thin, left: thin, right: thin }
 
-const COLS: { key: keyof Row | 'status'; label: string; width: number }[] = [
+const COLS: { key: keyof ExportRow; label: string; width: number }[] = [
   { key: 'stt', label: 'STT', width: 6 },
   { key: 'honorific', label: 'Danh xưng', width: 10 },
   { key: 'name', label: 'Họ và tên', width: 26 },
   { key: 'title', label: 'Chức danh', width: 34 },
-  { key: 'unit', label: 'Đơn vị', width: 28 },
-  { key: 'department', label: 'Bộ phận', width: 16 },
   { key: 'status', label: 'Trạng thái', width: 16 },
   { key: 'link', label: 'Link thiệp', width: 46 },
+  { key: 'spouseHonorific', label: 'Danh xưng phu nhân/phu quân', width: 18 },
+  { key: 'spouseName', label: 'Họ và tên phu nhân/phu quân', width: 28 },
+  { key: 'spouseLink', label: 'Link thiệp phu nhân/phu quân', width: 46 },
+  { key: 'spouseStatus', label: 'Trạng thái link thiệp', width: 18 },
 ]
 
 const titleStyle = {
@@ -58,21 +73,67 @@ const cellStyle = (rowIndex: number, extra: Record<string, unknown> = {}) => ({
   ...extra,
 })
 
+const normalize = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+
+const statusOf = (row: Row) => (row.partySize === null ? 'Chưa xác nhận' : 'Đã xác nhận')
+
+const isSpouseRow = (row: Row) => {
+  const title = normalize(row.title ?? '')
+  return title.includes('phu nhan') || title.includes('phu quan')
+}
+
+const exportRows = (rows: Row[]): ExportRow[] => {
+  const list: ExportRow[] = []
+
+  for (const row of rows) {
+    if (isSpouseRow(row)) {
+      const title = normalize(row.title ?? '')
+      const staff = [...list]
+        .reverse()
+        .find((item) => !item.spouseName && title.includes(normalize(item.name)))
+
+      if (staff) {
+        staff.spouseHonorific = row.honorific ?? ''
+        staff.spouseName = row.name
+        staff.spouseLink = row.link
+        staff.spouseStatus = statusOf(row)
+        continue
+      }
+    }
+
+    list.push({
+      stt: list.length + 1,
+      honorific: row.honorific ?? '',
+      name: row.name,
+      title: row.title ?? '',
+      status: statusOf(row),
+      link: row.link,
+      spouseHonorific: '',
+      spouseName: '',
+      spouseLink: '',
+      spouseStatus: '',
+    })
+  }
+
+  return list
+}
+
 const buildSheet = (rows: Row[], title: string): XLSX.WorkSheet => {
   const lastCol = COLS.length - 1
+  const list = exportRows(rows)
   const aoa: unknown[][] = [
     [title],
     ['Lễ kỷ niệm 14 năm thành lập Tập đoàn Bateco'],
     [],
     COLS.map((col) => col.label),
-    ...rows.map((row) =>
-      COLS.map((col) => {
-        if (col.key === 'status') return row.partySize === null ? 'Chưa xác nhận' : 'Đã xác nhận'
-        if (col.key === 'stt') return row.stt
-        const value = row[col.key as keyof Row]
-        return value ?? ''
-      }),
-    ),
+    ...list.map((row) => COLS.map((col) => row[col.key])),
   ]
 
   const ws = XLSX.utils.aoa_to_sheet(aoa)
@@ -94,23 +155,23 @@ const buildSheet = (rows: Row[], title: string): XLSX.WorkSheet => {
     if (cell) cell.s = headerStyle
   })
 
-  rows.forEach((row, i) => {
+  list.forEach((row, i) => {
     const r = i + 4
     COLS.forEach((col, c) => {
       const cell = at(r, c)
       if (!cell) return
-      const center = col.key === 'stt' || col.key === 'status'
+      const center = col.key === 'stt' || col.key === 'status' || col.key === 'spouseStatus'
       const extra: Record<string, unknown> = {}
       if (center) extra.alignment = { horizontal: 'center', vertical: 'center' }
-      if (col.key === 'name') extra.font = { sz: 10, bold: true }
-      if (col.key === 'status') {
+      if (col.key === 'name' || col.key === 'spouseName') extra.font = { sz: 10, bold: true }
+      if ((col.key === 'status' || col.key === 'spouseStatus') && cell.v) {
         extra.font = {
           sz: 10,
           bold: true,
-          color: { rgb: row.partySize === null ? '9AA0A6' : '1E7A34' },
+          color: { rgb: cell.v === 'Chưa xác nhận' ? '9AA0A6' : '1E7A34' },
         }
       }
-      if (col.key === 'link') {
+      if ((col.key === 'link' || col.key === 'spouseLink') && cell.v) {
         cell.l = { Target: String(cell.v || ''), Tooltip: 'Mở thiệp' }
         extra.font = { sz: 9, color: { rgb: '1155CC' }, underline: true }
       }

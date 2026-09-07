@@ -54,7 +54,8 @@ const GuestFormDialog = ({ origin, categories, onSaved, guest }: Props) => {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<GuestFormValue>(guest ?? EMPTY)
   const [saving, setSaving] = useState(false)
-  const showOptional = (key: 'unit' | 'department' | 'partner') => !isEdit || hasValue(guest?.[key] ?? '')
+  const showOptional = (key: 'unit' | 'department' | 'partner') =>
+    isEdit && hasValue(guest?.[key] ?? '')
   const showUnitDepartment = showOptional('unit') || showOptional('department')
   const unitDepartmentColumns =
     showOptional('unit') && showOptional('department') ? 'grid-cols-2' : 'grid-cols-1'
