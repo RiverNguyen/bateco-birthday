@@ -39,6 +39,7 @@ const EMPTY: GuestFormValue = {
 }
 
 const FIELDS = ['category', 'honorific', 'name', 'title', 'unit', 'department', 'partner'] as const
+const hasValue = (value: string) => value.trim().length > 0
 
 type Props = {
   origin: string
@@ -53,6 +54,10 @@ const GuestFormDialog = ({ origin, categories, onSaved, guest }: Props) => {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<GuestFormValue>(guest ?? EMPTY)
   const [saving, setSaving] = useState(false)
+  const showOptional = (key: 'unit' | 'department' | 'partner') => !isEdit || hasValue(guest?.[key] ?? '')
+  const showUnitDepartment = showOptional('unit') || showOptional('department')
+  const unitDepartmentColumns =
+    showOptional('unit') && showOptional('department') ? 'grid-cols-2' : 'grid-cols-1'
 
   const reset = (next: boolean) => {
     setOpen(next)
@@ -174,33 +179,41 @@ const GuestFormDialog = ({ origin, categories, onSaved, guest }: Props) => {
               onChange={set('title')}
             />
           </div>
-          <div className='grid grid-cols-2 gap-3'>
+          {showUnitDepartment && (
+            <div className={`grid ${unitDepartmentColumns} gap-3`}>
+              {showOptional('unit') && (
+                <div className='grid gap-1.5'>
+                  <Label htmlFor='g-unit'>Đơn vị</Label>
+                  <Input
+                    id='g-unit'
+                    value={form.unit}
+                    onChange={set('unit')}
+                  />
+                </div>
+              )}
+              {showOptional('department') && (
+                <div className='grid gap-1.5'>
+                  <Label htmlFor='g-department'>Bộ phận</Label>
+                  <Input
+                    id='g-department'
+                    value={form.department}
+                    onChange={set('department')}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          {showOptional('partner') && (
             <div className='grid gap-1.5'>
-              <Label htmlFor='g-unit'>Đơn vị</Label>
+              <Label htmlFor='g-partner'>Đi cùng (Phu nhân / Phu quân)</Label>
               <Input
-                id='g-unit'
-                value={form.unit}
-                onChange={set('unit')}
+                id='g-partner'
+                value={form.partner}
+                onChange={set('partner')}
+                placeholder='Phu nhân'
               />
             </div>
-            <div className='grid gap-1.5'>
-              <Label htmlFor='g-department'>Bộ phận</Label>
-              <Input
-                id='g-department'
-                value={form.department}
-                onChange={set('department')}
-              />
-            </div>
-          </div>
-          <div className='grid gap-1.5'>
-            <Label htmlFor='g-partner'>Đi cùng (Phu nhân / Phu quân)</Label>
-            <Input
-              id='g-partner'
-              value={form.partner}
-              onChange={set('partner')}
-              placeholder='Phu nhân'
-            />
-          </div>
+          )}
         </div>
 
         <DialogFooter>

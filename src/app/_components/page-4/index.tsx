@@ -145,13 +145,12 @@ const Page4 = () => {
           <>
             <motion.p
               variants={fadeUp}
-              className='page-four-copy mt-6 font-lora text-[0.9rem] leading-relaxed text-[#5b3d19]'
+              className='page-four-copy mt-6 font-lora text-[0.9rem] leading-relaxed text-[#5b3d19] max-w-[15rem]'
             >
               Kính mời{' '}
               <span className='font-bold text-[#002352]'>
                 {[guest.honorific, guest.name].filter(Boolean).join(' ')}
-              </span>
-              {' '}
+              </span>{' '}
               xác nhận tham dự.
             </motion.p>
 

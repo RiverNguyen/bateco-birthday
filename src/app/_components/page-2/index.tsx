@@ -19,11 +19,7 @@ const Page2 = () => {
     ? [guest.honorific, guest.name].filter(Boolean).join(' ')
     : 'Ông Phạm Trung Hưng'
   // Thiệp nội bộ: chỉ hiện chức danh, bỏ đơn vị / bộ phận.
-  const guestSubtitle = guest
-    ? guest.category === 'Nội bộ'
-      ? [guest.title].filter(Boolean)
-      : [guest.title, [guest.unit, guest.department].filter(Boolean).join(' - ')].filter(Boolean)
-    : ['Nguyên Chánh văn phòng', 'Tập đoàn Công nghiệp Than - Khoáng sản Việt Nam']
+
   const isActive = useIsActivePage(FLIP_STATE.spread)
   const revealed = useRevealOnce(isActive)
   const animateState = revealed ? 'show' : 'hidden'
@@ -103,18 +99,12 @@ const Page2 = () => {
         >
           {guestName}
         </motion.p>
-        {guestSubtitle.length > 0 && (
+        {guest?.title && (
           <motion.p
             variants={fadeUp}
             className='page-two-subtitle font-lora text-[0.75rem]'
-          >
-            {guestSubtitle.map((line, index) => (
-              <span key={line}>
-                {index > 0 && <br />}
-                {line}
-              </span>
-            ))}
-          </motion.p>
+            dangerouslySetInnerHTML={{ __html: guest.title }}
+          />
         )}
         <motion.div
           variants={fadeUp}

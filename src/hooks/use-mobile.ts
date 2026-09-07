@@ -19,6 +19,14 @@ function getServerSnapshot() {
   return false
 }
 
+function subscribeToPlatform() {
+  return () => {}
+}
+
+function getAndroidSnapshot() {
+  return /Android/i.test(window.navigator.userAgent)
+}
+
 export function useIsMobile() {
   return React.useSyncExternalStore(
     (onStoreChange) => subscribeToQuery(MOBILE_QUERY, onStoreChange),
@@ -33,4 +41,8 @@ export function useIsTablet() {
     () => getQuerySnapshot(TABLET_QUERY),
     getServerSnapshot,
   )
+}
+
+export function useIsAndroid() {
+  return React.useSyncExternalStore(subscribeToPlatform, getAndroidSnapshot, getServerSnapshot)
 }

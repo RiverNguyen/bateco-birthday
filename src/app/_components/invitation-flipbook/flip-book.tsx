@@ -8,12 +8,13 @@ import {
   ActivePageProvider,
   BookOrientationProvider,
 } from '@/app/_components/invitation-flipbook/active-page-context'
+import MobileFlipBook from '@/app/_components/invitation-flipbook/mobile-flip-book'
 import { useBookPageSize } from '@/app/_components/invitation-flipbook/use-book-page-size'
 import Page1 from '@/app/_components/page-1'
 import Page2 from '@/app/_components/page-2'
 import Page3 from '@/app/_components/page-3'
 import Page4 from '@/app/_components/page-4'
-import { useIsMobile, useIsTablet } from '@/hooks/use-mobile'
+import { useIsAndroid, useIsMobile, useIsTablet } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
 type PageFlipHandle = {
@@ -69,7 +70,9 @@ const FlipBook = () => {
   const bookRef = useRef<PageFlipHandle>(null)
   const isMobile = useIsMobile()
   const isTablet = useIsTablet()
+  const isAndroid = useIsAndroid()
   const isCompactBook = isMobile || isTablet
+  const useLightweightFlip = isCompactBook && isAndroid
   const [activePage, setActivePage] = useState(0)
   const [pageState, setPageState] = useState('read')
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
@@ -106,15 +109,23 @@ const FlipBook = () => {
 
   const flipPrev = useCallback(() => {
     if (!canFlipPrev) return
+    if (useLightweightFlip) {
+      setActivePage((page) => Math.max(page - 1, 0))
+      return
+    }
     setFlipDirection('back')
     bookRef.current?.pageFlip().flipPrev()
-  }, [canFlipPrev])
+  }, [canFlipPrev, useLightweightFlip])
 
   const flipNext = useCallback(() => {
     if (!canFlipNext) return
+    if (useLightweightFlip) {
+      setActivePage((page) => Math.min(page + 1, pages.length - 1))
+      return
+    }
     setFlipDirection('forward')
     bookRef.current?.pageFlip().flipNext()
-  }, [canFlipNext])
+  }, [canFlipNext, pages.length, useLightweightFlip])
 
   // Chỉ dựng HTMLFlipBook SAU khi mount — lúc đó `isMobile` và kích thước đã đúng,
   // nên không phải remount (nguồn gây giật trang đầu trên mobile).
@@ -179,12 +190,19 @@ const FlipBook = () => {
                 className='book-shell'
                 data-page-state={pageState}
                 data-flip-direction={effectiveFlipDirection ?? undefined}
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerEnd}
-                onPointerCancel={handlePointerEnd}
+                onPointerDown={useLightweightFlip ? undefined : handlePointerDown}
+                onPointerMove={useLightweightFlip ? undefined : handlePointerMove}
+                onPointerUp={useLightweightFlip ? undefined : handlePointerEnd}
+                onPointerCancel={useLightweightFlip ? undefined : handlePointerEnd}
               >
-                {mounted && bookPageSize.width > 0 && (
+                {mounted && useLightweightFlip && (
+                  <MobileFlipBook
+                    pages={pages}
+                    index={activePage}
+                    onChange={setActivePage}
+                  />
+                )}
+                {mounted && !useLightweightFlip && bookPageSize.width > 0 && (
                   <HTMLFlipBook
                     key={isCompactBook ? 'compact-book' : 'desktop-book'}
                     ref={bookRef}

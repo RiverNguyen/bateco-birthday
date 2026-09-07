@@ -34,7 +34,7 @@ const Face = ({ children, back = false }: { children: React.ReactNode; back?: bo
   <div
     className={cn(
       'invitation-flip-page absolute inset-0 h-full w-full select-none overflow-hidden bg-[#f8f1e4]',
-      'shadow-[0_1.5rem_4rem_rgba(44,31,14,0.28)] [backface-visibility:hidden]',
+      'shadow-[0_0.75rem_1.8rem_rgba(44,31,14,0.2)] [backface-visibility:hidden] [contain:layout_paint]',
       back && '[transform:rotateY(180deg)]',
     )}
   >
@@ -53,29 +53,44 @@ const isInteractiveTarget = (target: EventTarget | null) =>
  */
 const MobileFlipBook = ({ pages, index, onChange }: MobileFlipBookProps) => {
   const stageRef = useRef<HTMLDivElement>(null)
+  const flipperRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<DragState | null>(null)
+  const angleRef = useRef(0)
+  const dirRef = useRef<0 | 1 | -1>(0)
 
   const [dragDir, setDragDir] = useState<0 | 1 | -1>(0)
-  const [angle, setAngle] = useState(0)
   const [animated, setAnimated] = useState(false)
 
   const last = pages.length - 1
   const canGo = (dir: 1 | -1) => (dir === 1 ? index < last : index > 0)
+  const applyAngle = (nextAngle: number, transition = 'none') => {
+    angleRef.current = nextAngle
+    const flipper = flipperRef.current
+    if (!flipper) return
+    const sign = dirRef.current === -1 ? -1 : 1
+    flipper.style.transition = transition
+    flipper.style.transform = `translateZ(0) rotateY(${sign * nextAngle}deg)`
+  }
 
   const beginFlip = (dir: 1 | -1) => {
+    dirRef.current = dir
     setDragDir(dir)
-    setAngle(0)
     setAnimated(false)
+    angleRef.current = 0
+    const flipper = flipperRef.current
+    if (!flipper) return
+    flipper.style.transition = 'none'
+    flipper.style.transform = 'translateZ(0) rotateY(0deg)'
   }
 
   const commit = () => {
     setAnimated(true)
-    setAngle(180)
+    applyAngle(180, `transform ${SETTLE_MS}ms cubic-bezier(0.22, 0.61, 0.36, 1)`)
   }
 
   const cancel = () => {
     setAnimated(true)
-    setAngle(0)
+    applyAngle(0, `transform ${SETTLE_MS}ms cubic-bezier(0.22, 0.61, 0.36, 1)`)
   }
 
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -114,7 +129,7 @@ const MobileFlipBook = ({ pages, index, onChange }: MobileFlipBookProps) => {
 
     const width = stageRef.current?.clientWidth || 1
     const progress = Math.min(1, Math.abs(dx) / width)
-    setAngle(progress * 180)
+    applyAngle(progress * 180)
   }
 
   const handleTap = (e: React.PointerEvent) => {
@@ -155,10 +170,11 @@ const MobileFlipBook = ({ pages, index, onChange }: MobileFlipBookProps) => {
 
   const handleTransitionEnd = (e: React.TransitionEvent) => {
     if (e.propertyName !== 'transform') return
-    const completed = angle >= 180
+    const completed = angleRef.current >= 180
+    const dir = dirRef.current
     setAnimated(false)
-    setAngle(0)
-    const dir = dragDir
+    applyAngle(0)
+    dirRef.current = 0
     setDragDir(0)
     if (completed && dir !== 0) onChange(index + dir)
   }
@@ -166,22 +182,23 @@ const MobileFlipBook = ({ pages, index, onChange }: MobileFlipBookProps) => {
   const neighborIndex = dragDir === -1 ? Math.max(index - 1, 0) : Math.min(index + 1, last)
   const front = pages[index]?.content
   const back = pages[neighborIndex]?.content
-  const sign = dragDir === -1 ? -1 : 1
 
   return (
     <div
       ref={stageRef}
-      className='relative h-full w-full touch-none select-none [perspective:2600px]'
+      className='relative h-full w-full touch-pan-y select-none [perspective:2600px] [transform:translateZ(0)]'
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={finishDrag}
       onPointerCancel={handlePointerCancel}
     >
       <div
-        className='mfb-flipper absolute inset-0 [transform-style:preserve-3d]'
+        ref={flipperRef}
+        className='mfb-flipper absolute inset-0 [backface-visibility:hidden] [transform-style:preserve-3d]'
         style={{
-          transform: `rotateY(${sign * angle}deg)`,
-          transition: animated ? `transform ${SETTLE_MS}ms cubic-bezier(0.22, 0.61, 0.36, 1)` : 'none',
+          transform: 'translateZ(0) rotateY(0deg)',
+          transition: 'none',
+          willChange: 'transform',
         }}
         onTransitionEnd={handleTransitionEnd}
       >
