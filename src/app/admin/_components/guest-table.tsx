@@ -1,6 +1,14 @@
 'use client'
 
-import { CheckIcon, DownloadIcon, SearchIcon, Trash2Icon } from 'lucide-react'
+import {
+  ArrowDownIcon,
+  ArrowUpDownIcon,
+  ArrowUpIcon,
+  CheckIcon,
+  DownloadIcon,
+  SearchIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts'
 import { toast } from 'sonner'
@@ -28,6 +36,15 @@ import {
 } from '@/components/ui/chart'
 import { Input } from '@/components/ui/input'
 import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import {
   Table,
   TableBody,
   TableCell,
@@ -53,9 +70,97 @@ export type GuestRow = {
 }
 
 const PAGE_SIZE = 10
+const SIBLING_PAGES = 1
+type SortKey = 'stt' | 'category' | 'name' | 'link' | 'status' | 'confirmedAt'
+type SortDirection = 'asc' | 'desc'
 
 const normalize = (value: string) =>
   value.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
+
+const dateFormatter = new Intl.DateTimeFormat('vi-VN', {
+  dateStyle: 'short',
+  timeStyle: 'short',
+  hour12: false,
+})
+
+const formatConfirmedAt = (value: string | null) => {
+  if (!value) return '—'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+  return dateFormatter.format(date)
+}
+
+const confirmedAtTime = (row: GuestRow) =>
+  row.confirmedAt ? new Date(row.confirmedAt).getTime() : Number.NEGATIVE_INFINITY
+
+const compareText = (a: string | null, b: string | null, direction: SortDirection) => {
+  const aValue = normalize(a?.trim() ?? '')
+  const bValue = normalize(b?.trim() ?? '')
+
+  if (!aValue && !bValue) return 0
+  if (!aValue) return 1
+  if (!bValue) return -1
+
+  const result = aValue.localeCompare(bValue, 'vi')
+  return direction === 'asc' ? result : -result
+}
+
+const compareNumber = (a: number, b: number, direction: SortDirection) =>
+  direction === 'asc' ? a - b : b - a
+
+const compareNullableNumber = (a: number | null, b: number | null, direction: SortDirection) => {
+  if (a === null && b === null) return 0
+  if (a === null) return 1
+  if (b === null) return -1
+  return compareNumber(a, b, direction)
+}
+
+const compareRows = (a: GuestRow, b: GuestRow, sortKey: SortKey, direction: SortDirection) => {
+  switch (sortKey) {
+    case 'stt':
+      return compareNumber(a.stt, b.stt, direction)
+    case 'category':
+      return compareText(catOf(a), catOf(b), direction)
+    case 'name':
+      return compareText(
+        `${a.honorific ?? ''} ${a.name}`,
+        `${b.honorific ?? ''} ${b.name}`,
+        direction,
+      )
+    case 'link':
+      return compareText(a.link, b.link, direction)
+    case 'status':
+      return compareNumber(a.partySize === null ? 0 : 1, b.partySize === null ? 0 : 1, direction)
+    case 'confirmedAt':
+      return compareNullableNumber(
+        a.confirmedAt ? confirmedAtTime(a) : null,
+        b.confirmedAt ? confirmedAtTime(b) : null,
+        direction,
+      )
+  }
+
+  return 0
+}
+
+const getPaginationItems = (current: number, pageCount: number) => {
+  const visible = new Set([1, pageCount])
+  for (
+    let pageNumber = current - SIBLING_PAGES;
+    pageNumber <= current + SIBLING_PAGES;
+    pageNumber += 1
+  ) {
+    if (pageNumber >= 1 && pageNumber <= pageCount) visible.add(pageNumber)
+  }
+
+  const pages = [...visible].sort((a, b) => a - b)
+  return pages.flatMap((pageNumber, index) => {
+    const previous = pages[index - 1]
+    if (previous && pageNumber - previous > 1) {
+      return [`ellipsis-${previous}-${pageNumber}`, pageNumber] as const
+    }
+    return [pageNumber] as const
+  })
+}
 
 const chartConfig = {
   count: { label: 'Số khách', color: '#002352' },
@@ -79,13 +184,61 @@ const StatCard = ({ label, value, hint }: { label: string; value: number; hint?:
 const CATEGORY_FALLBACK = 'Khác'
 const catOf = (row: GuestRow) => row.category?.trim() || CATEGORY_FALLBACK
 
+type SortableHeadProps = {
+  active: boolean
+  align?: 'left' | 'center' | 'right'
+  className?: string
+  direction: SortDirection
+  label: string
+  onSort: () => void
+}
+
+const SortableHead = ({
+  active,
+  align = 'left',
+  className,
+  direction,
+  label,
+  onSort,
+}: SortableHeadProps) => {
+  const Icon = active ? (direction === 'asc' ? ArrowUpIcon : ArrowDownIcon) : ArrowUpDownIcon
+  const justify = align === 'right' ? 'justify-end' : align === 'center' ? 'justify-center' : ''
+
+  return (
+    <TableHead className={className}>
+      <Button
+        variant='ghost'
+        size='sm'
+        className={`h-8 w-full px-0 font-semibold hover:bg-transparent ${justify}`}
+        aria-sort={active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'}
+        onClick={onSort}
+      >
+        {label}
+        <Icon className='size-3.5' />
+      </Button>
+    </TableHead>
+  )
+}
+
 const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
   const [query, setQuery] = useState('')
   const [tab, setTab] = useState('all')
   const [status, setStatus] = useState<'all' | 'confirmed' | 'pending'>('all')
   const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<{ key: SortKey; direction: SortDirection }>({
+    key: 'confirmedAt',
+    direction: 'desc',
+  })
   const [copied, setCopied] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const setSortKey = (key: SortKey) => {
+    setSort((currentSort) => ({
+      key,
+      direction: currentSort.key === key && currentSort.direction === 'asc' ? 'desc' : 'asc',
+    }))
+    setPage(1)
+  }
 
   const deleteGuest = async (guestId: string) => {
     setDeletingId(guestId)
@@ -133,21 +286,27 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
 
   const filtered = useMemo(() => {
     const q = normalize(query.trim())
-    return scoped.filter((row) => {
-      if (status === 'confirmed' && row.partySize === null) return false
-      if (status === 'pending' && row.partySize !== null) return false
-      if (!q) return true
-      return normalize(
-        `${row.honorific ?? ''} ${row.name} ${row.title ?? ''} ${row.unit ?? ''}`,
-      ).includes(q)
-    })
-  }, [scoped, query, status])
+    return scoped
+      .filter((row) => {
+        if (status === 'confirmed' && row.partySize === null) return false
+        if (status === 'pending' && row.partySize !== null) return false
+        if (!q) return true
+        return normalize(
+          `${row.honorific ?? ''} ${row.name} ${row.title ?? ''} ${row.unit ?? ''}`,
+        ).includes(q)
+      })
+      .toSorted((a, b) => {
+        const result = compareRows(a, b, sort.key, sort.direction)
+        return result === 0 ? a.stt - b.stt : result
+      })
+  }, [scoped, query, status, sort])
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const current = Math.min(page, pageCount)
   const pageRows = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE)
+  const paginationItems = getPaginationItems(current, pageCount)
   const showGroupColumn = tab === 'all' && categories.length > 1
-  const columnCount = (showGroupColumn ? 5 : 4) + 1
+  const columnCount = (showGroupColumn ? 6 : 5) + 1
   const categoryNames = categories.map(([name]) => name)
 
   const copy = async (text: string, id: string) => {
@@ -309,11 +468,49 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='w-12'>STT</TableHead>
-              {showGroupColumn && <TableHead className='w-28'>Nhóm</TableHead>}
-              <TableHead>Họ tên</TableHead>
-              <TableHead>Link</TableHead>
-              <TableHead className='w-40 text-center'>Xác nhận</TableHead>
+              <SortableHead
+                label='STT'
+                className='w-12'
+                active={sort.key === 'stt'}
+                direction={sort.direction}
+                onSort={() => setSortKey('stt')}
+              />
+              {showGroupColumn && (
+                <SortableHead
+                  label='Nhóm'
+                  className='w-28'
+                  active={sort.key === 'category'}
+                  direction={sort.direction}
+                  onSort={() => setSortKey('category')}
+                />
+              )}
+              <SortableHead
+                label='Họ tên'
+                active={sort.key === 'name'}
+                direction={sort.direction}
+                onSort={() => setSortKey('name')}
+              />
+              <SortableHead
+                label='Link'
+                active={sort.key === 'link'}
+                direction={sort.direction}
+                onSort={() => setSortKey('link')}
+              />
+              <SortableHead
+                label='Xác nhận'
+                className='w-40'
+                align='center'
+                active={sort.key === 'status'}
+                direction={sort.direction}
+                onSort={() => setSortKey('status')}
+              />
+              <SortableHead
+                label='Thời gian'
+                className='w-40'
+                active={sort.key === 'confirmedAt'}
+                direction={sort.direction}
+                onSort={() => setSortKey('confirmedAt')}
+              />
               <TableHead className='w-32 text-right'>Thao tác</TableHead>
             </TableRow>
           </TableHeader>
@@ -375,6 +572,9 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
                       <Badge variant='secondary'>Đã xác nhận</Badge>
                     )}
                   </TableCell>
+                  <TableCell className='whitespace-nowrap text-sm text-gray-600'>
+                    {formatConfirmedAt(row.confirmedAt)}
+                  </TableCell>
                   <TableCell>
                     <div className='flex justify-end gap-1'>
                       <GuestFormDialog
@@ -432,8 +632,9 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
           {filtered.length > 0 && (
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={columnCount - 2}>Tổng số thiệp đã xác nhận</TableCell>
+                <TableCell colSpan={columnCount - 3}>Tổng số thiệp đã xác nhận</TableCell>
                 <TableCell className='text-center font-semibold'>{stats.people}</TableCell>
+                <TableCell />
                 <TableCell />
               </TableRow>
             </TableFooter>
@@ -442,28 +643,56 @@ const GuestTable = ({ rows, loading, origin, onRefresh }: Props) => {
       </div>
 
       {pageCount > 1 && (
-        <div className='flex items-center justify-between text-sm text-gray-500'>
+        <div className='flex flex-wrap items-center justify-between gap-3 text-sm text-gray-500'>
           <span>
             {filtered.length} khách · trang {current}/{pageCount}
           </span>
-          <div className='flex gap-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              disabled={current <= 1}
-              onClick={() => setPage(current - 1)}
-            >
-              Trước
-            </Button>
-            <Button
-              variant='outline'
-              size='sm'
-              disabled={current >= pageCount}
-              onClick={() => setPage(current + 1)}
-            >
-              Sau
-            </Button>
-          </div>
+          <Pagination className='mx-0 w-auto'>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href='#'
+                  text='Trước'
+                  aria-disabled={current <= 1}
+                  className={current <= 1 ? 'opacity-50' : undefined}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setPage(Math.max(1, current - 1))
+                  }}
+                />
+              </PaginationItem>
+              {paginationItems.map((item) => (
+                <PaginationItem key={item}>
+                  {typeof item === 'string' ? (
+                    <PaginationEllipsis />
+                  ) : (
+                    <PaginationLink
+                      href='#'
+                      isActive={item === current}
+                      onClick={(event) => {
+                        event.preventDefault()
+                        setPage(item)
+                      }}
+                    >
+                      {item}
+                    </PaginationLink>
+                  )}
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  href='#'
+                  text='Sau'
+                  aria-disabled={current >= pageCount}
+                  className={current >= pageCount ? 'opacity-50' : undefined}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setPage(Math.min(pageCount, current + 1))
+                  }}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
     </div>
